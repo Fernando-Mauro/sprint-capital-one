@@ -57,6 +57,19 @@ export interface RetaPlayer {
   users?: UserProfile;
 }
 
+export interface RetaChatMessage {
+  id: string;
+  reta_id: string;
+  user_id: string;
+  message: string;
+  created_at: string;
+  // Joined fields
+  users?: {
+    username: string;
+    avatar_url: string | null;
+  };
+}
+
 export interface ServiceResult<T> {
   data: T | null;
   error: string | null;

@@ -2,11 +2,12 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { getMatchById, joinMatch, leaveMatch, cancelMatch } from '@/services/matches';
-import { ArrowLeft, Calendar, CheckCircle2, Clock, MapPin, Send, Star, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, CheckCircle2, Clock, MapPin, Star, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+import { ChatWindow } from '@/components/chat/chat-window';
 import type { Reta, RetaPlayer } from '@/types';
 
 export default function MatchDetailPage() {
@@ -16,7 +17,6 @@ export default function MatchDetailPage() {
   const [reta, setReta] = useState<(Reta & { reta_players: RetaPlayer[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [message, setMessage] = useState('');
 
   const loadReta = useCallback(async () => {
     const result = await getMatchById(id);
@@ -194,30 +194,8 @@ export default function MatchDetailPage() {
             </div>
           </div>
 
-          {/* Chat Placeholder */}
-          <section className="bg-surface-container flex flex-col h-[400px] border border-outline-variant">
-            <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
-              <h3 className="font-headline font-black uppercase tracking-tight">CHAT DE LA RETA</h3>
-              <span className="w-2 h-2 bg-primary rounded-full" />
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto flex items-center justify-center">
-              <p className="text-on-surface-variant text-xs font-bold uppercase">
-                Chat próximamente
-              </p>
-            </div>
-            <div className="p-4 bg-surface-container-lowest flex gap-2">
-              <input
-                className="flex-1 bg-surface-container-high border-0 focus:ring-1 focus:ring-primary text-xs font-bold p-3 focus:outline-none"
-                placeholder="ESCRIBE UN MENSAJE..."
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-              <button className="bg-primary-container text-on-primary-container px-4 hover:bg-primary transition-colors">
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </section>
+          {/* Chat System */}
+          <ChatWindow retaId={reta.id} user={user} />
 
           {/* Organizer Tools */}
           {isOrganizer && reta.status !== 'cancelled' && (
