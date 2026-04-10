@@ -4,13 +4,15 @@ import type { ReactNode } from 'react';
 
 export const metadata = {
   title: 'MatchUp',
-  description: 'Find and join pick-up sports matches in your area.',
+  description: 'Encuentra y únete a retas deportivas cerca de ti.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="es">
+      <body className="min-h-screen bg-background text-on-surface font-sans antialiased selection:bg-primary selection:text-on-primary-fixed">
+        {children}
+      </body>
     </html>
   );
 }

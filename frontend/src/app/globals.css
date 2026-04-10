@@ -1,35 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,900;1,900&family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --border: #e5e5e5;
-  --ring: #2563eb;
-  --radius: 0.5rem;
+@theme {
+  --font-headline: 'Epilogue', sans-serif;
+  --font-sans: 'Inter', sans-serif;
+
+  --color-background: #0e0e0e;
+  --color-primary: #a4ffb9;
+  --color-primary-container: #00fd86;
+  --color-on-primary-fixed: #004620;
+
+  --color-surface-container-lowest: #000000;
+  --color-surface-container-low: #131313;
+  --color-surface-container: #1a1919;
+  --color-surface-container-high: #201f1f;
+  --color-surface-container-highest: #262626;
+
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #adaaaa;
+
+  --color-outline: #6b6b6b;
+  --color-outline-variant: #3a3a3a;
+
+  --color-error: #ff716c;
+  --color-error-dim: #d7383b;
+  --color-on-error: #490006;
+
+  --color-tertiary: #7de6ff;
+  --color-tertiary-container: #00dcff;
+  --color-on-tertiary: #005361;
+  --color-on-tertiary-container: #002b33;
+
+  --color-on-primary-container: #00fd86;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-    --muted: #262626;
-    --muted-foreground: #a3a3a3;
-    --border: #262626;
-    --ring: #3b82f6;
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-sans antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.brutalist-shadow {
+  box-shadow: 8px 8px 0px 0px rgba(0, 253, 134, 0.2);
+}
+
+.slant-box {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+}
+
+.skew-tag {
+  transform: skewX(-12deg);
+}
+.skew-tag-content {
+  transform: skewX(12deg);
 }
