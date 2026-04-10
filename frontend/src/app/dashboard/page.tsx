@@ -6,6 +6,7 @@ import MatchCard from '@/components/matches/MatchCard';
 import SportFilters from '@/components/matches/SportFilters';
 import { getMatches, getSports } from '@/services/matches';
 import { Plus } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -51,10 +52,12 @@ export default function DashboardPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-surface-container-low p-8 border-l-8 border-primary-container">
         <div className="absolute right-0 top-0 w-1/2 h-full opacity-20 grayscale">
-          <img
+          <Image
             alt="Sport"
             className="w-full h-full object-cover"
             src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1000&auto=format&fit=crop"
+            fill
+            sizes="50vw"
           />
         </div>
         <div className="relative z-10">

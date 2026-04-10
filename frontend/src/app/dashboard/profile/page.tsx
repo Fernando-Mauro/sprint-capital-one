@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserStats, getUserRetaHistory } from '@/services/users';
 import { BadgeCheck, ChevronRight, LogOut, PlusCircle, Settings, Trophy } from 'lucide-react';
+import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function ProfilePage() {
@@ -58,7 +59,13 @@ export default function ProfilePage() {
         <div className="relative group">
           <div className="w-40 h-40 bg-surface-container-high overflow-hidden brutalist-shadow border-4 border-primary-container flex items-center justify-center">
             {user.avatar_url ? (
-              <img className="w-full h-full object-cover" src={user.avatar_url} alt="Profile" />
+              <Image
+                className="w-full h-full object-cover"
+                src={user.avatar_url}
+                alt="Profile"
+                width={160}
+                height={160}
+              />
             ) : (
               <span className="font-headline font-black text-6xl text-primary">
                 {user.username?.charAt(0).toUpperCase() ?? '?'}

@@ -1,5 +1,6 @@
 import { getSportImage } from '@/lib/sport-images';
 import { ArrowLeft, Calendar, Clock, MapPin } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import type { Reta } from '@/types';
@@ -11,10 +12,13 @@ interface MatchHeroProps {
 export default function MatchHero({ reta }: MatchHeroProps) {
   return (
     <section className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-      <img
+      <Image
         className="w-full h-full object-cover grayscale-[0.3] brightness-75"
-        src={getSportImage(reta.sports?.name)}
-        alt={reta.sports?.name ?? 'Match'}
+        src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=2000&auto=format&fit=crop"
+        alt="Match"
+        fill
+        sizes="100vw"
+        priority
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
       <div className="absolute top-4 left-4">
