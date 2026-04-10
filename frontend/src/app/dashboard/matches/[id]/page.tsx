@@ -92,7 +92,7 @@ export default function MatchDetailPage() {
         text: `¡Únete a mi matchup: ${reta?.title}!`,
         url: window.location.href,
       });
-    } catch (_err) {
+    } catch {
       void navigator.clipboard.writeText(window.location.href);
       alert('Link copiado al portapapeles');
     }
