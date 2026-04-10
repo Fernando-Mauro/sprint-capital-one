@@ -14,7 +14,11 @@ interface MatchFilters {
 
 export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<Reta[]>> {
   const supabase = getSupabase();
-  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true });
+  let query = supabase
+    .from('retas')
+    .select('*, sports(*)')
+    .order('date', { ascending: true })
+    .limit(50);
 
   if (filters?.sport_id) {
     query = query.eq('sport_id', filters.sport_id);
@@ -25,7 +29,6 @@ export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<
 
   const { data, error } = await query;
   if (error) return { data: null, error: error.message };
-  // Supabase returns joined data that doesn't match the generated types
   return { data: data as unknown as Reta[], error: null };
 }
 
@@ -70,7 +73,6 @@ export async function createMatch(
   });
 
   if (joinError) {
-    // Rollback the reta if join fails
     await supabase.from('retas').delete().eq('id', data.id);
     return { data: null, error: joinError.message };
   }
@@ -100,17 +102,17 @@ export async function joinMatch(
 ): Promise<ServiceResult<RetaPlayer>> {
   const supabase = getSupabase();
 
-  // Check if reta is full
-  const { data: reta } = await supabase
+  // Check if matchup is full
+  const { data: matchup } = await supabase
     .from('retas')
-    .select('current_players, max_players, status')
+    .select('organizer_id, title, current_players, max_players, status')
     .eq('id', retaId)
     .single();
 
-  if (!reta) return { data: null, error: 'Matchup no encontrado' };
-  if (reta.status === 'cancelled') return { data: null, error: 'Este matchup fue cancelado' };
-  if (reta.status === 'full') return { data: null, error: 'Este matchup está lleno' };
-  if (reta.current_players >= reta.max_players)
+  if (!matchup) return { data: null, error: 'Matchup no encontrado' };
+  if (matchup.status === 'cancelled') return { data: null, error: 'Este matchup fue cancelado' };
+  if (matchup.status === 'full') return { data: null, error: 'Este matchup está lleno' };
+  if (matchup.current_players >= matchup.max_players)
     return { data: null, error: 'No hay lugares disponibles' };
 
   // Check if already joined
@@ -137,46 +139,36 @@ export async function joinMatch(
 
   if (error) return { data: null, error: error.message };
 
-  // TODO: SECURITY - Replace with Supabase RPC for atomic increment to prevent race conditions
-  // Increment current_players
-  const { data: reta } = await supabase
-    .from('retas')
-    .select('organizer_id, title, current_players')
-    .eq('id', retaId)
-    .single();
-
-  if (reta) {
-    await supabase
-      .from('retas')
-      .update({ current_players: reta.current_players + 1 })
-      .eq('id', retaId);
-
-    // Notify the organizer (fire-and-forget)
-    const { data: joiningUser } = await supabase
-      .from('users')
-      .select('username')
-      .eq('id', userId)
-      .maybeSingle();
-
-    const username = joiningUser?.username ?? 'Un jugador';
-    const retaTitle = reta.title as string;
-
-    supabase
-      .from('notifications')
-      .insert({
-        user_id: reta.organizer_id as string,
-        type: 'player_joined',
-        title: 'Nuevo jugador en tu reta',
-        body: `${username} se unió a "${retaTitle}"`,
-        reta_id: retaId,
-      })
-      .then(({ error: notifError }) => {
-        if (notifError) {
-          console.error('Failed to insert join notification:', notifError.message);
-        }
-      });
+  // Increment current_players and auto-set full status
+  const newCount = matchup.current_players + 1;
+  const updateData: Record<string, unknown> = { current_players: newCount };
+  if (newCount >= matchup.max_players) {
+    updateData.status = 'full';
   }
   await supabase.from('retas').update(updateData).eq('id', retaId);
+
+  // Notify the organizer (fire-and-forget)
+  const { data: joiningUser } = await supabase
+    .from('users')
+    .select('username')
+    .eq('id', userId)
+    .maybeSingle();
+
+  const username = joiningUser?.username ?? 'Un jugador';
+  supabase
+    .from('notifications')
+    .insert({
+      user_id: matchup.organizer_id as string,
+      type: 'player_joined',
+      title: 'Nuevo jugador en tu matchup',
+      body: `${username} se unió a "${matchup.title}"`,
+      reta_id: retaId,
+    })
+    .then(({ error: notifError }) => {
+      if (notifError) {
+        console.error('Failed to insert join notification:', notifError.message);
+      }
+    });
 
   return { data: data as RetaPlayer, error: null };
 }
@@ -203,19 +195,17 @@ export async function leaveMatch(retaId: string, userId: string): Promise<Servic
 
   if (error) return { data: null, error: error.message };
 
-  // TODO: SECURITY - Replace with Supabase RPC for atomic decrement to prevent race conditions
   // Decrement current_players
-  const { data: reta } = await supabase
+  const { data: matchup } = await supabase
     .from('retas')
     .select('current_players, max_players')
     .eq('id', retaId)
     .single();
 
-  if (reta && reta.current_players > 0) {
-    const newCount = reta.current_players - 1;
+  if (matchup && matchup.current_players > 0) {
+    const newCount = matchup.current_players - 1;
     const updateData: Record<string, unknown> = { current_players: newCount };
-    // Re-open if was full
-    if (newCount < reta.max_players) {
+    if (newCount < matchup.max_players) {
       updateData.status = 'open';
     }
     await supabase.from('retas').update(updateData).eq('id', retaId);
@@ -228,7 +218,32 @@ export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
   return updateMatch(id, { status: 'cancelled' });
 }
 
+export async function getMyMatchups(userId: string): Promise<ServiceResult<Reta[]>> {
+  const supabase = getSupabase();
+
+  const { data: playerRows, error: playerError } = await supabase
+    .from('reta_players')
+    .select('reta_id')
+    .eq('user_id', userId)
+    .eq('status', 'confirmed');
+
+  if (playerError) return { data: null, error: playerError.message };
+  if (!playerRows || playerRows.length === 0) return { data: [], error: null };
+
+  const retaIds = playerRows.map((r) => r.reta_id);
+
+  const { data, error } = await supabase
+    .from('retas')
+    .select('*, sports(*)')
+    .in('id', retaIds)
+    .order('date', { ascending: true });
+
+  if (error) return { data: null, error: error.message };
+  return { data: data as unknown as Reta[], error: null };
+}
+
 export async function getSports(): Promise<ServiceResult<Sport[]>> {
+  const supabase = getSupabase();
   const { data, error } = await supabase.from('sports').select('*').order('name');
 
   if (error) return { data: null, error: error.message };
