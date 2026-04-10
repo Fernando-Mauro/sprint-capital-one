@@ -2,6 +2,9 @@ import '@/app/globals.css';
 
 import type { ReactNode } from 'react';
 
+// All pages use Supabase at runtime — skip static prerendering during build
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'MatchUp',
   description: 'Encuentra y únete a retas deportivas cerca de ti.',
