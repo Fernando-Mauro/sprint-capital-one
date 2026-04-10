@@ -12,7 +12,14 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ played: 0, organized: 0, noShows: 0 });
   const [sports, setSports] = useState<{ id: string; name: string; count: number }[]>([]);
   const [history, setHistory] = useState<
-    { reta: string; sport: string; date: string; result: string }[]
+    {
+      reta: string;
+      sport: string;
+      date: string;
+      startTime: string;
+      timeStatus: 'past' | 'live' | 'upcoming';
+      retaStatus: string;
+    }[]
   >([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,15 +33,30 @@ export default function ProfilePage() {
     setStats(userStats);
     setSports(userSports);
 
+    const today = new Date().toISOString().split('T')[0] ?? '';
+
     const formatted = (retaHistory ?? []).map((entry: Record<string, unknown>) => {
       const reta = entry.retas as Record<string, unknown> | null;
       const sport = reta?.sports as Record<string, unknown> | null;
+      const date = (reta?.date as string) ?? '';
+      const retaStatus = (reta?.status as string) ?? '';
+
+      let timeStatus: 'past' | 'live' | 'upcoming';
+      if (retaStatus === 'completed' || date < today) {
+        timeStatus = 'past';
+      } else if (retaStatus === 'in_progress' || date === today) {
+        timeStatus = 'live';
+      } else {
+        timeStatus = 'upcoming';
+      }
+
       return {
         reta: (reta?.title as string) ?? 'Matchup',
         sport: (sport?.name as string) ?? 'Deporte',
-        date: (reta?.date as string) ?? '',
-        result:
-          (entry.status as string) === 'confirmed' ? 'Jugado' : ((entry.status as string) ?? ''),
+        date,
+        startTime: (reta?.start_time as string) ?? '',
+        timeStatus,
+        retaStatus,
       };
     });
     setHistory(formatted);
@@ -207,36 +229,59 @@ export default function ProfilePage() {
           </p>
         ) : (
           <div className="space-y-1">
-            {history.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-surface-container-low p-4 flex items-center gap-6 opacity-60 hover:opacity-100 transition-all cursor-pointer group"
-              >
-                <div className="text-center min-w-[60px]">
-                  <div className="font-headline font-black text-xl leading-none">
-                    {item.date.split('-')[2] ?? '--'}
-                  </div>
-                  <div className="font-sans text-[10px] uppercase font-bold text-on-surface-variant">
-                    {item.date.split('-')[1] ?? ''}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm uppercase tracking-tight group-hover:text-primary transition-colors">
-                    {item.reta}
-                  </h4>
-                  <p className="font-sans text-xs text-on-surface-variant">{item.sport}</p>
-                </div>
-                <span
+            {history.map((item, idx) => {
+              const statusLabel =
+                item.timeStatus === 'live'
+                  ? 'EN VIVO'
+                  : item.timeStatus === 'upcoming'
+                    ? 'PRÓXIMO'
+                    : item.retaStatus === 'cancelled'
+                      ? 'CANCELADO'
+                      : 'JUGADO';
+
+              const statusClass =
+                item.timeStatus === 'live'
+                  ? 'bg-primary text-on-primary animate-pulse'
+                  : item.timeStatus === 'upcoming'
+                    ? 'bg-tertiary text-on-tertiary'
+                    : item.retaStatus === 'cancelled'
+                      ? 'bg-error/20 text-error'
+                      : 'bg-primary-container text-on-primary-fixed';
+
+              return (
+                <div
+                  key={idx}
                   className={cn(
-                    'text-[10px] font-black px-2 py-1 uppercase italic',
-                    'bg-primary-container text-on-primary-fixed',
+                    'bg-surface-container-low p-4 flex items-center gap-6 transition-all cursor-pointer group',
+                    item.timeStatus === 'past' ? 'opacity-60 hover:opacity-100' : 'opacity-100',
                   )}
                 >
-                  {item.result}
-                </span>
-                <ChevronRight className="w-4 h-4 text-outline group-hover:text-primary transition-colors" />
-              </div>
-            ))}
+                  <div className="text-center min-w-[60px]">
+                    <div className="font-headline font-black text-xl leading-none">
+                      {item.date.split('-')[2] ?? '--'}
+                    </div>
+                    <div className="font-sans text-[10px] uppercase font-bold text-on-surface-variant">
+                      {item.date.split('-')[1] ?? ''}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-sm uppercase tracking-tight group-hover:text-primary transition-colors">
+                      {item.reta}
+                    </h4>
+                    <p className="font-sans text-xs text-on-surface-variant">
+                      {item.sport}
+                      {item.startTime ? ` — ${item.startTime}` : ''}
+                    </p>
+                  </div>
+                  <span
+                    className={cn('text-[10px] font-black px-2 py-1 uppercase italic', statusClass)}
+                  >
+                    {statusLabel}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-outline group-hover:text-primary transition-colors" />
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
