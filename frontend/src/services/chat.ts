@@ -1,10 +1,14 @@
 import { createBrowserClient } from '@/lib/supabase/client';
+
 import type { ServiceResult, RetaChatMessage } from '@/types';
 
-const supabase = createBrowserClient();
+function getSupabase() {
+  return createBrowserClient();
+}
 
 export async function getChatMessages(retaId: string): Promise<ServiceResult<RetaChatMessage[]>> {
   try {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('reta_chat')
       .select('*, users(username, avatar_url)')
@@ -26,15 +30,14 @@ export async function sendChatMessage(
   message: string,
 ): Promise<ServiceResult<RetaChatMessage>> {
   try {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('reta_chat')
-      .insert([
-        {
-          reta_id: retaId,
-          user_id: userId,
-          message: message,
-        },
-      ])
+      .insert({
+        reta_id: retaId,
+        user_id: userId,
+        message,
+      })
       .select('*, users(username, avatar_url)')
       .single();
 
@@ -48,6 +51,7 @@ export async function sendChatMessage(
 }
 
 export function subscribeToChat(retaId: string, onMessage: (message: RetaChatMessage) => void) {
+  const supabase = getSupabase();
   return supabase
     .channel(`reta_chat:${retaId}`)
     .on(
@@ -59,8 +63,8 @@ export function subscribeToChat(retaId: string, onMessage: (message: RetaChatMes
         filter: `reta_id=eq.${retaId}`,
       },
       async (payload: { new: Record<string, unknown> }) => {
-        // Fetch user data for the new message as Realtime payload only includes the row
-        const { data } = await supabase
+        const fetchClient = getSupabase();
+        const { data } = await fetchClient
           .from('reta_chat')
           .select('*, users(username, avatar_url)')
           .eq('id', payload.new.id)

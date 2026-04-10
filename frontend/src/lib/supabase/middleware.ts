@@ -31,11 +31,13 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     },
   );
 
+  // Use getSession() instead of getUser() — reads from cookies locally
+  // without making a network call to Supabase. Much faster for middleware.
+  // getUser() is still used in server components that need validated auth.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  // Redirect unauthenticated users to login (except public routes)
   const isAuthRoute =
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register') ||
@@ -45,14 +47,13 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     request.nextUrl.pathname.startsWith('/update-password');
   const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute;
 
-  if (!user && !isPublicRoute) {
+  if (!session && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isAuthRoute) {
+  if (session && isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
