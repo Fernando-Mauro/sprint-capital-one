@@ -22,7 +22,6 @@ export default function MatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
 
   const loadReta = useCallback(async () => {
     const result = await getMatchById(id);
