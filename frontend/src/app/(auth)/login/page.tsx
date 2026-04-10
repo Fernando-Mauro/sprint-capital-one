@@ -59,11 +59,11 @@ export default function LoginPage() {
   return (
     <AuthBackground>
       <main className="relative z-10 w-full max-w-lg px-6 py-12">
-        <header className="mb-12 text-center md:text-left">
+        <header className="mb-12 flex flex-col items-center text-center">
           <h1 className="font-headline text-6xl md:text-8xl font-black uppercase tracking-tighter italic text-primary-container leading-none mb-4">
             MATCHUP
           </h1>
-          <p className="font-headline text-2xl md:text-4xl font-black uppercase tracking-tighter text-on-surface leading-tight max-w-sm">
+          <p className="font-headline text-2xl md:text-4xl font-black uppercase tracking-tighter text-on-surface leading-tight max-w-sm mx-auto">
             TU PRÓXIMO JUEGO EMPIEZA AQUÍ
           </p>
         </header>
