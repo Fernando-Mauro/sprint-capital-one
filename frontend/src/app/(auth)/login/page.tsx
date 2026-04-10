@@ -1,5 +1,7 @@
 'use client';
 
+import AuthBackground from '@/components/auth/AuthBackground';
+import ErrorAlert from '@/components/ui/ErrorAlert';
 import { useAuth } from '@/hooks/use-auth';
 import { Globe, Lock, Mail, Bolt } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -27,15 +29,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-      <div
-        className="fixed inset-0 z-0 bg-cover bg-center grayscale-[0.5] brightness-[0.3]"
-        style={{
-          backgroundImage:
-            'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000&auto=format&fit=crop)',
-        }}
-      />
-
+    <AuthBackground>
       <main className="relative z-10 w-full max-w-lg px-6 py-12">
         <header className="mb-12 text-center md:text-left">
           <h1 className="font-headline text-6xl md:text-8xl font-black uppercase tracking-tighter italic text-primary-container leading-none mb-4">
@@ -59,11 +53,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {error && (
-            <div className="bg-error/10 border border-error text-error text-sm font-bold p-3">
-              {error}
-            </div>
-          )}
+          {error && <ErrorAlert message={error} />}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
@@ -131,9 +121,6 @@ export default function LoginPage() {
           </p>
         </footer>
       </main>
-
-      <div className="fixed top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-container/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="fixed bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-tertiary-container/5 rounded-full blur-[100px] pointer-events-none" />
-    </div>
+    </AuthBackground>
   );
 }
