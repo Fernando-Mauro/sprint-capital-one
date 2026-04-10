@@ -14,7 +14,10 @@ const createRetaSchema = z.object({
   longitude: z.number().min(-180).max(180),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
   start_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Invalid time format (HH:MM)'),
-  end_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Invalid time format (HH:MM)').optional(),
+  end_time: z
+    .string()
+    .regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Invalid time format (HH:MM)')
+    .optional(),
   max_players: z.number().int().min(2).max(100),
   min_skill_level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   description: z.string().max(2000).optional(),

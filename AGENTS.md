@@ -553,14 +553,15 @@ export function useAuth() {
 
 ```tsx
 // ❌ WRONG — unoptimized external images
-<img src="https://images.unsplash.com/..." alt="Match" />
+<img src="https://images.unsplash.com/..." alt="Match" />;
 
 // ✅ CORRECT — Next.js Image with remote patterns configured in next.config.ts
 import Image from 'next/image';
-<Image src="https://images.unsplash.com/..." alt="Match" fill sizes="100vw" />
+<Image src="https://images.unsplash.com/..." alt="Match" fill sizes="100vw" />;
 ```
 
 Remote patterns must be configured in `next.config.ts`:
+
 ```ts
 images: {
   remotePatterns: [
@@ -603,14 +604,14 @@ images: {
 
 ## Common Bugs & Fixes
 
-| Issue                                | Cause                                     | Fix                                                           |
-| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------- |
-| Infinite re-render                   | Object in useCallback deps                | Use `obj?.id` (primitive) instead                             |
-| "can't access lexical declaration"   | useEffect before useCallback              | Move useCallback above useEffect                              |
-| Supabase `.single()` throws PGRST116 | No row found                              | Use `.maybeSingle()` instead                                  |
-| S3 upload 403                        | Wrong IAM policy or expired presigned URL | Check bucket policy + URL TTL                                 |
-| Middleware redirect loop             | Missing matcher config                    | Add `matcher` array to `middleware.ts` config                 |
-| Hydration mismatch                   | Server/client render different content    | Ensure consistent rendering or use `suppressHydrationWarning` |
-| `@supabase/ssr` type mismatch        | `@supabase/ssr@0.5.2` imports from `supabase-js/dist/module/lib/types` which doesn't exist in `supabase-js@2.103.0` | Upgrade `@supabase/ssr` or use `any` with eslint-disable comment |
-| Race condition in joinMatch/leaveMatch | Non-atomic read-then-update of `current_players` | Replace with Supabase RPC for atomic increment/decrement |
-| Unsanitized OAuth username           | OAuth metadata used directly for username generation | Sanitize with `replace(/[^a-z0-9_]/g, '')` + length limit |
+| Issue                                  | Cause                                                                                                               | Fix                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Infinite re-render                     | Object in useCallback deps                                                                                          | Use `obj?.id` (primitive) instead                                |
+| "can't access lexical declaration"     | useEffect before useCallback                                                                                        | Move useCallback above useEffect                                 |
+| Supabase `.single()` throws PGRST116   | No row found                                                                                                        | Use `.maybeSingle()` instead                                     |
+| S3 upload 403                          | Wrong IAM policy or expired presigned URL                                                                           | Check bucket policy + URL TTL                                    |
+| Middleware redirect loop               | Missing matcher config                                                                                              | Add `matcher` array to `middleware.ts` config                    |
+| Hydration mismatch                     | Server/client render different content                                                                              | Ensure consistent rendering or use `suppressHydrationWarning`    |
+| `@supabase/ssr` type mismatch          | `@supabase/ssr@0.5.2` imports from `supabase-js/dist/module/lib/types` which doesn't exist in `supabase-js@2.103.0` | Upgrade `@supabase/ssr` or use `any` with eslint-disable comment |
+| Race condition in joinMatch/leaveMatch | Non-atomic read-then-update of `current_players`                                                                    | Replace with Supabase RPC for atomic increment/decrement         |
+| Unsanitized OAuth username             | OAuth metadata used directly for username generation                                                                | Sanitize with `replace(/[^a-z0-9_]/g, '')` + length limit        |

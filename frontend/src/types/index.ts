@@ -9,9 +9,4 @@ export type {
   ParticipantStatus,
 } from './database';
 
-export type {
-  Match,
-  MatchParticipant,
-  CreateMatchInput,
-  UpdateMatchInput,
-} from './matches';
+export type { Match, MatchParticipant, CreateMatchInput, UpdateMatchInput } from './matches';

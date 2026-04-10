@@ -11,7 +11,11 @@ interface MatchFilters {
 }
 
 export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<Reta[]>> {
-  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true }).limit(50);
+  let query = supabase
+    .from('retas')
+    .select('*, sports(*)')
+    .order('date', { ascending: true })
+    .limit(50);
 
   if (filters?.sport_id) {
     query = query.eq('sport_id', filters.sport_id);
