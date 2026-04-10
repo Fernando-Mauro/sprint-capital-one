@@ -1,6 +1,6 @@
 'use client';
 
-import { MAP_STYLE_URL, getUserLocation, searchPlaces } from '@/lib/aws-location';
+import { MAP_STYLE_URL, geocodeText, getUserLocation, searchPlaces } from '@/lib/aws-location';
 import maplibregl from 'maplibre-gl';
 import { MapPin, Search } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -97,12 +97,26 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
     [userPos],
   );
 
-  const handleSelectSuggestion = (place: PlaceSuggestion) => {
+  const handleSelectSuggestion = async (place: PlaceSuggestion) => {
     setQuery(place.label);
     setShowSuggestions(false);
+
+    // If suggestion already has coordinates, use them directly
     if (place.latitude && place.longitude) {
       setMarker([place.longitude, place.latitude]);
       onChange({ name: place.label, latitude: place.latitude, longitude: place.longitude });
+      return;
+    }
+
+    // Otherwise, geocode the label to get coordinates
+    const geocoded = await geocodeText(place.label, userPos ?? undefined);
+    if (geocoded && geocoded.latitude && geocoded.longitude) {
+      setMarker([geocoded.longitude, geocoded.latitude]);
+      onChange({
+        name: geocoded.label,
+        latitude: geocoded.latitude,
+        longitude: geocoded.longitude,
+      });
     }
   };
 
