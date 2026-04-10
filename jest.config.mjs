@@ -2,8 +2,12 @@
 const config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/frontend/tests'],
-  testMatch: ['**/frontend/tests/unit/**/*.test.ts', '**/frontend/tests/unit/**/*.test.tsx'],
+  roots: ['<rootDir>/frontend/tests', '<rootDir>/utils'],
+  testMatch: [
+    '**/frontend/tests/unit/**/*.test.ts',
+    '**/frontend/tests/unit/**/*.test.tsx',
+    '**/utils/**/*.test.ts',
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/frontend/src/$1',
   },

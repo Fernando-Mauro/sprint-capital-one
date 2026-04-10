@@ -12,7 +12,7 @@ interface KickResult {
   message: string;
 }
 
-export function canJoinReta(
+export function canJoinMatch(
   currentPlayers: number,
   maxPlayers: number,
   userSkill: SkillLevel,

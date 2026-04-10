@@ -1,23 +1,23 @@
 import { describe, test, expect } from '@jest/globals';
-import { canJoinReta, kickPlayer } from './matchmaking';
+import { canJoinMatch, kickPlayer } from './matchmaking';
 
 describe('Matchmaking Logic - Join Match', () => {
   test('should not allow joining a full match', () => {
-    const result = canJoinReta(10, 10, 'intermediate', 'intermediate');
+    const result = canJoinMatch(10, 10, 'intermediate', 'intermediate');
     expect(result.success).toBe(false);
     expect(result.warning).toBe(false);
     expect(result.message).toBe('The match is full.');
   });
 
   test('should send a warning when a beginner joins an advanced match', () => {
-    const result = canJoinReta(5, 10, 'beginner', 'advanced');
+    const result = canJoinMatch(5, 10, 'beginner', 'advanced');
     expect(result.success).toBe(true);
     expect(result.warning).toBe(true);
     expect(result.message).toContain('Warning');
   });
 
   test('should allow joining normally without warnings when skill levels match', () => {
-    const result = canJoinReta(5, 10, 'intermediate', 'intermediate');
+    const result = canJoinMatch(5, 10, 'intermediate', 'intermediate');
     expect(result.success).toBe(true);
     expect(result.warning).toBe(false);
   });
