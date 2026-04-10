@@ -5,13 +5,8 @@ export type {
   RetaPlayer,
   ServiceResult,
   NotificationType,
-} from './database';
-
-export type {
-  Match,
-  MatchParticipant,
   MatchStatus,
   ParticipantStatus,
-  CreateMatchInput,
-  UpdateMatchInput,
-} from './matches';
+} from './database';
+
+export type { Match, MatchParticipant, CreateMatchInput, UpdateMatchInput } from './matches';

@@ -39,7 +39,7 @@ export default function HomePage(): ReactNode {
 
         <footer className="mt-16">
           <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
-            Performance Driven UI © 2024 MatchUp
+            Created by Muchachos, idk © 2026 MatchUp
           </p>
         </footer>
       </main>
