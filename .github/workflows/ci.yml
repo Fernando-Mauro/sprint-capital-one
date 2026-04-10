@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - uses: actions/cache/save@v4
         with:
           path: node_modules
