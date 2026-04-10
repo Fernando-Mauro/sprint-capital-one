@@ -62,8 +62,4 @@ export interface ServiceResult<T> {
   error: string | null;
 }
 
-export type NotificationType =
-  | 'reta_full'
-  | 'reta_reminder'
-  | 'player_joined'
-  | 'reta_cancelled';
+export type NotificationType = 'reta_full' | 'reta_reminder' | 'player_joined' | 'reta_cancelled';

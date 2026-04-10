@@ -74,7 +74,10 @@ export default function CreateMatchPage() {
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-12">
       {/* Top */}
       <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="text-white hover:bg-surface-container transition-colors p-2">
+        <Link
+          href="/dashboard"
+          className="text-white hover:bg-surface-container transition-colors p-2"
+        >
           <ArrowLeft className="w-6 h-6" />
         </Link>
       </div>
@@ -83,17 +86,23 @@ export default function CreateMatchPage() {
         <h1 className="font-headline font-black text-5xl uppercase leading-none tracking-tighter mb-2">
           NUEVA <span className="text-primary-container">RETA</span>
         </h1>
-        <p className="text-on-surface-variant font-bold uppercase text-sm tracking-widest">Configura el encuentro</p>
+        <p className="text-on-surface-variant font-bold uppercase text-sm tracking-widest">
+          Configura el encuentro
+        </p>
       </header>
 
       {error && (
-        <div className="bg-error/10 border border-error text-error text-sm font-bold p-3">{error}</div>
+        <div className="bg-error/10 border border-error text-error text-sm font-bold p-3">
+          {error}
+        </div>
       )}
 
       <form className="space-y-12" onSubmit={handleSubmit}>
         {/* Sport Selection */}
         <section>
-          <label className="block font-headline font-black text-xl uppercase mb-6 italic">Selecciona Deporte</label>
+          <label className="block font-headline font-black text-xl uppercase mb-6 italic">
+            Selecciona Deporte
+          </label>
           <div className="flex flex-wrap gap-3">
             {sports.map((sport) => (
               <button
@@ -116,7 +125,9 @@ export default function CreateMatchPage() {
         {/* Info Grid */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">Título del Encuentro</label>
+            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+              Título del Encuentro
+            </label>
             <input
               className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-2xl font-black uppercase placeholder:text-surface-container-highest focus:border-primary-container transition-colors focus:outline-none"
               placeholder="EJ: FINAL CHAMPIONS BARRIO"
@@ -127,7 +138,9 @@ export default function CreateMatchPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">Fecha</label>
+            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+              Fecha
+            </label>
             <div className="relative">
               <input
                 className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-lg font-bold text-on-surface appearance-none focus:border-primary-container focus:outline-none"
@@ -140,7 +153,9 @@ export default function CreateMatchPage() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">Hora de Inicio</label>
+            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+              Hora de Inicio
+            </label>
             <input
               className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-lg font-bold text-on-surface appearance-none focus:border-primary-container focus:outline-none"
               type="time"
@@ -150,7 +165,9 @@ export default function CreateMatchPage() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">Cancha / Ubicación</label>
+            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+              Cancha / Ubicación
+            </label>
             <div className="relative">
               <input
                 className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-lg font-bold uppercase placeholder:text-surface-container-highest focus:border-primary-container focus:outline-none"
@@ -169,8 +186,12 @@ export default function CreateMatchPage() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-12 p-8 bg-surface-container-low">
           <div className="space-y-6">
             <div className="flex justify-between items-end">
-              <label className="text-xs font-bold uppercase text-outline tracking-widest">Max Jugadores</label>
-              <span className="text-3xl font-headline font-black text-primary-container">{maxPlayers}</span>
+              <label className="text-xs font-bold uppercase text-outline tracking-widest">
+                Max Jugadores
+              </label>
+              <span className="text-3xl font-headline font-black text-primary-container">
+                {maxPlayers}
+              </span>
             </div>
             <input
               className="w-full h-1 bg-surface-container-highest appearance-none cursor-pointer accent-primary-container"
@@ -186,7 +207,9 @@ export default function CreateMatchPage() {
             </div>
           </div>
           <div className="space-y-6">
-            <label className="block text-xs font-bold uppercase text-outline tracking-widest">Nivel Mínimo</label>
+            <label className="block text-xs font-bold uppercase text-outline tracking-widest">
+              Nivel Mínimo
+            </label>
             <div className="flex bg-surface-container-lowest p-1">
               {['Novato', 'Inter', 'Pro'].map((lvl) => (
                 <button
@@ -195,7 +218,9 @@ export default function CreateMatchPage() {
                   onClick={() => setLevel(lvl)}
                   className={cn(
                     'flex-1 py-3 text-xs font-black uppercase transition-all',
-                    level === lvl ? 'bg-primary-container text-on-primary-fixed' : 'text-on-surface-variant hover:text-white',
+                    level === lvl
+                      ? 'bg-primary-container text-on-primary-fixed'
+                      : 'text-on-surface-variant hover:text-white',
                   )}
                 >
                   {lvl}
@@ -208,7 +233,9 @@ export default function CreateMatchPage() {
         {/* Description & Visibility */}
         <section className="space-y-8">
           <div>
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">Descripción</label>
+            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+              Descripción
+            </label>
             <textarea
               className="w-full bg-surface-container-lowest border-2 border-outline-variant p-4 text-lg font-medium placeholder:text-surface-container-highest focus:border-primary-container transition-colors resize-none focus:outline-none"
               placeholder="REGLAS, COOPERACIÓN, ETC..."
@@ -219,10 +246,18 @@ export default function CreateMatchPage() {
           </div>
           <div className="flex items-center justify-between p-6 border-2 border-outline-variant">
             <div className="flex items-center gap-4">
-              {isPublic ? <Globe className="text-primary w-8 h-8" /> : <Lock className="text-error w-8 h-8" />}
+              {isPublic ? (
+                <Globe className="text-primary w-8 h-8" />
+              ) : (
+                <Lock className="text-error w-8 h-8" />
+              )}
               <div>
-                <p className="font-black uppercase text-sm leading-none mb-1">{isPublic ? 'Reta Pública' : 'Reta Privada'}</p>
-                <p className="text-xs text-on-surface-variant uppercase font-bold">{isPublic ? 'Cualquiera puede unirse' : 'Solo con invitación'}</p>
+                <p className="font-black uppercase text-sm leading-none mb-1">
+                  {isPublic ? 'Reta Pública' : 'Reta Privada'}
+                </p>
+                <p className="text-xs text-on-surface-variant uppercase font-bold">
+                  {isPublic ? 'Cualquiera puede unirse' : 'Solo con invitación'}
+                </p>
               </div>
             </div>
             <button
@@ -233,10 +268,12 @@ export default function CreateMatchPage() {
                 isPublic ? 'bg-primary-container' : 'bg-surface-container-highest',
               )}
             >
-              <div className={cn(
-                'w-6 h-6 bg-on-surface transition-transform',
-                isPublic ? 'translate-x-6' : 'translate-x-0',
-              )} />
+              <div
+                className={cn(
+                  'w-6 h-6 bg-on-surface transition-transform',
+                  isPublic ? 'translate-x-6' : 'translate-x-0',
+                )}
+              />
             </button>
           </div>
         </section>

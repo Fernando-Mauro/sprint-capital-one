@@ -8,7 +8,10 @@ export default function HomePage(): ReactNode {
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       <div
         className="fixed inset-0 z-0 bg-cover bg-center grayscale-[0.5] brightness-[0.3]"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000&auto=format&fit=crop)' }}
+        style={{
+          backgroundImage:
+            'url(https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000&auto=format&fit=crop)',
+        }}
       />
 
       <main className="relative z-10 w-full max-w-lg px-6 py-12 text-center">

@@ -42,7 +42,8 @@ export default function DashboardPage() {
         </div>
         <div className="relative z-10">
           <h1 className="font-headline font-black text-5xl md:text-7xl uppercase leading-[0.9] tracking-tighter mb-2 italic">
-            PRÓXIMAS <br /><span className="text-primary-container">RETAS</span>
+            PRÓXIMAS <br />
+            <span className="text-primary-container">RETAS</span>
           </h1>
           <p className="font-sans font-bold text-primary max-w-xs uppercase tracking-widest text-xs">
             Busca. Únete. Domina la cancha.
@@ -121,7 +122,9 @@ export default function DashboardPage() {
                     {reta.min_skill_level && (
                       <div className="flex items-center gap-1 text-primary-container">
                         <TrendingUp className="w-3 h-3" />
-                        <span className="text-[10px] font-bold uppercase">Nivel: {reta.min_skill_level}</span>
+                        <span className="text-[10px] font-bold uppercase">
+                          Nivel: {reta.min_skill_level}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -141,10 +144,12 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="flex justify-between items-end mb-2">
-                    <span className={cn(
-                      'text-xs font-black uppercase tracking-wider',
-                      isAlmostFull ? 'text-error' : 'text-primary',
-                    )}>
+                    <span
+                      className={cn(
+                        'text-xs font-black uppercase tracking-wider',
+                        isAlmostFull ? 'text-error' : 'text-primary',
+                      )}
+                    >
                       {reta.current_players}/{reta.max_players} Jugadores
                     </span>
                   </div>

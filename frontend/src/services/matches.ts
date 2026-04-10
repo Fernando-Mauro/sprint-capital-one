@@ -10,13 +10,8 @@ interface MatchFilters {
   status?: string;
 }
 
-export async function getMatches(
-  filters?: MatchFilters,
-): Promise<ServiceResult<Reta[]>> {
-  let query = supabase
-    .from('retas')
-    .select('*, sports(*)')
-    .order('date', { ascending: true });
+export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<Reta[]>> {
+  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true });
 
   if (filters?.sport_id) {
     query = query.eq('sport_id', filters.sport_id);
@@ -130,10 +125,7 @@ export async function joinMatch(
   return { data: data as RetaPlayer, error: null };
 }
 
-export async function leaveMatch(
-  retaId: string,
-  userId: string,
-): Promise<ServiceResult<null>> {
+export async function leaveMatch(retaId: string, userId: string): Promise<ServiceResult<null>> {
   const { error } = await supabase
     .from('reta_players')
     .delete()
@@ -159,17 +151,12 @@ export async function leaveMatch(
   return { data: null, error: null };
 }
 
-export async function cancelMatch(
-  id: string,
-): Promise<ServiceResult<Reta>> {
+export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
   return updateMatch(id, { status: 'cancelled' });
 }
 
 export async function getSports(): Promise<ServiceResult<{ id: string; name: string }[]>> {
-  const { data, error } = await supabase
-    .from('sports')
-    .select('id, name')
-    .order('name');
+  const { data, error } = await supabase.from('sports').select('id, name').order('name');
 
   if (error) return { data: null, error: error.message };
   return { data, error: null };

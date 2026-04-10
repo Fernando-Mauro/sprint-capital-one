@@ -4,14 +4,8 @@ import type { UserProfile, ServiceResult } from '@/types';
 
 const supabase = createBrowserClient();
 
-export async function getUserProfile(
-  id: string,
-): Promise<ServiceResult<UserProfile>> {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+export async function getUserProfile(id: string): Promise<ServiceResult<UserProfile>> {
+  const { data, error } = await supabase.from('users').select('*').eq('id', id).maybeSingle();
 
   if (error) return { data: null, error: error.message };
   if (!data) return { data: null, error: 'Usuario no encontrado' };
@@ -20,7 +14,9 @@ export async function getUserProfile(
 
 export async function updateUserProfile(
   id: string,
-  input: Partial<Pick<UserProfile, 'full_name' | 'username' | 'avatar_url' | 'phone' | 'skill_level'>>,
+  input: Partial<
+    Pick<UserProfile, 'full_name' | 'username' | 'avatar_url' | 'phone' | 'skill_level'>
+  >,
 ): Promise<ServiceResult<UserProfile>> {
   const { data, error } = await supabase
     .from('users')

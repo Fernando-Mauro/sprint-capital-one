@@ -34,7 +34,9 @@ export default function OnboardingPage() {
             <div className="bg-tertiary-container text-on-tertiary-container w-12 h-12 flex items-center justify-center slant-box">
               <Trophy className="w-6 h-6 font-bold" />
             </div>
-            <h2 className="font-headline text-2xl font-black uppercase tracking-tighter">PERFIL DE RENDIMIENTO</h2>
+            <h2 className="font-headline text-2xl font-black uppercase tracking-tighter">
+              PERFIL DE RENDIMIENTO
+            </h2>
           </div>
 
           <div className="space-y-10">
@@ -58,14 +60,29 @@ export default function OnboardingPage() {
                       )}
                     >
                       <div className="flex flex-col">
-                        <span className={cn('font-headline font-black uppercase text-sm', isActive ? 'text-primary' : 'text-on-surface')}>
+                        <span
+                          className={cn(
+                            'font-headline font-black uppercase text-sm',
+                            isActive ? 'text-primary' : 'text-on-surface',
+                          )}
+                        >
                           {level.name}
                         </span>
-                        <span className={cn('text-[10px] font-bold', isActive ? 'text-primary/80' : 'text-on-surface-variant')}>
+                        <span
+                          className={cn(
+                            'text-[10px] font-bold',
+                            isActive ? 'text-primary/80' : 'text-on-surface-variant',
+                          )}
+                        >
                           {level.desc}
                         </span>
                       </div>
-                      <CheckCircle2 className={cn('w-6 h-6', isActive ? 'text-primary fill-primary/20' : 'text-outline')} />
+                      <CheckCircle2
+                        className={cn(
+                          'w-6 h-6',
+                          isActive ? 'text-primary fill-primary/20' : 'text-outline',
+                        )}
+                      />
                     </button>
                   );
                 })}

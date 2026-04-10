@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request): Promise<NextResponse> {
   const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -13,10 +15,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const sportId = searchParams.get('sport_id');
   const status = searchParams.get('status');
 
-  let query = supabase
-    .from('retas')
-    .select('*, sports(*)')
-    .order('date', { ascending: true });
+  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true });
 
   if (sportId) query = query.eq('sport_id', sportId);
   if (status) query = query.eq('status', status);
@@ -32,7 +31,9 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 export async function POST(request: Request): Promise<NextResponse> {
   const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

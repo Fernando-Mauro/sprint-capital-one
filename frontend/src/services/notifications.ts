@@ -15,9 +15,7 @@ interface Notification {
   created_at: string;
 }
 
-export async function getNotifications(
-  userId: string,
-): Promise<ServiceResult<Notification[]>> {
+export async function getNotifications(userId: string): Promise<ServiceResult<Notification[]>> {
   const { data, error } = await supabase
     .from('notifications')
     .select('*')
@@ -28,9 +26,7 @@ export async function getNotifications(
   return { data: data as Notification[], error: null };
 }
 
-export async function markAsRead(
-  notificationIds: string[],
-): Promise<ServiceResult<null>> {
+export async function markAsRead(notificationIds: string[]): Promise<ServiceResult<null>> {
   const { error } = await supabase
     .from('notifications')
     .update({ is_read: true })
@@ -47,11 +43,7 @@ export async function createNotification(input: {
   body?: string;
   reta_id?: string;
 }): Promise<ServiceResult<Notification>> {
-  const { data, error } = await supabase
-    .from('notifications')
-    .insert(input)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('notifications').insert(input).select().single();
 
   if (error) return { data: null, error: error.message };
   return { data: data as Notification, error: null };

@@ -20,8 +20,8 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 pb-safe bg-surface-container-low/90 backdrop-blur-xl border-t border-surface-container-highest shadow-[0_-10px_40px_rgba(0,253,134,0.08)]">
       {tabs.map((tab) => {
         const Icon = tab.icon;
-        const isActive = pathname === tab.href ||
-          (tab.id === 'explore' && pathname === '/dashboard');
+        const isActive =
+          pathname === tab.href || (tab.id === 'explore' && pathname === '/dashboard');
 
         return (
           <Link
@@ -29,7 +29,9 @@ export default function BottomNav() {
             href={tab.href}
             className={cn(
               'flex flex-col items-center justify-center transition-all',
-              isActive ? 'text-primary-container scale-110' : 'text-on-surface-variant hover:text-primary',
+              isActive
+                ? 'text-primary-container scale-110'
+                : 'text-on-surface-variant hover:text-primary',
             )}
           >
             <Icon className={cn('w-6 h-6', isActive && 'fill-current')} />

@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,900;1,900&family=Inter:wght@400;500;600;700;800;900&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --font-headline: "Epilogue", sans-serif;
-  --font-sans: "Inter", sans-serif;
+  --font-headline: 'Epilogue', sans-serif;
+  --font-sans: 'Inter', sans-serif;
 
   --color-background: #0e0e0e;
   --color-primary: #a4ffb9;

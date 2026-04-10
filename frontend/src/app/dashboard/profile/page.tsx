@@ -9,7 +9,9 @@ import { useCallback, useEffect, useState } from 'react';
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const [stats, setStats] = useState({ played: 0, organized: 0, noShows: 0 });
-  const [history, setHistory] = useState<{ reta: string; sport: string; date: string; result: string }[]>([]);
+  const [history, setHistory] = useState<
+    { reta: string; sport: string; date: string; result: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   const loadProfileData = useCallback(async () => {
@@ -27,7 +29,8 @@ export default function ProfilePage() {
         reta: (reta?.title as string) ?? 'Reta',
         sport: (sport?.name as string) ?? 'Deporte',
         date: (reta?.date as string) ?? '',
-        result: (entry.status as string) === 'confirmed' ? 'Jugada' : (entry.status as string) ?? '',
+        result:
+          (entry.status as string) === 'confirmed' ? 'Jugada' : ((entry.status as string) ?? ''),
       };
     });
     setHistory(formatted);
@@ -41,7 +44,9 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-pulse font-headline font-black text-2xl text-on-surface-variant">CARGANDO...</div>
+        <div className="animate-pulse font-headline font-black text-2xl text-on-surface-variant">
+          CARGANDO...
+        </div>
       </div>
     );
   }
@@ -72,7 +77,9 @@ export default function ProfilePage() {
           <div className="flex flex-wrap gap-4 justify-center md:justify-start items-center">
             <div className="flex items-center gap-2">
               <BadgeCheck className="text-primary-container w-5 h-5 fill-current" />
-              <span className="font-sans text-sm font-bold text-on-surface-variant uppercase">Jugador Verificado</span>
+              <span className="font-sans text-sm font-bold text-on-surface-variant uppercase">
+                Jugador Verificado
+              </span>
             </div>
           </div>
         </div>
@@ -80,7 +87,11 @@ export default function ProfilePage() {
           <button className="hover:bg-surface-container transition-colors p-2">
             <Settings className="w-6 h-6 text-on-surface-variant" />
           </button>
-          <button onClick={signOut} className="hover:bg-surface-container transition-colors p-2" title="Cerrar sesión">
+          <button
+            onClick={signOut}
+            className="hover:bg-surface-container transition-colors p-2"
+            title="Cerrar sesión"
+          >
             <LogOut className="w-6 h-6 text-error" />
           </button>
         </div>
@@ -101,16 +112,24 @@ export default function ProfilePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
             <div className="bg-surface-container-low p-8 flex flex-col justify-between">
-              <span className="font-sans font-bold text-on-surface-variant uppercase text-xs">Retas Jugadas</span>
+              <span className="font-sans font-bold text-on-surface-variant uppercase text-xs">
+                Retas Jugadas
+              </span>
               <span className="font-headline font-black text-6xl text-white">{stats.played}</span>
             </div>
             <div className="bg-primary-container p-8 flex flex-col justify-between">
-              <span className="font-sans font-bold text-on-primary-fixed uppercase text-xs">Organizadas</span>
-              <span className="font-headline font-black text-6xl text-on-primary-fixed">{stats.organized}</span>
+              <span className="font-sans font-bold text-on-primary-fixed uppercase text-xs">
+                Organizadas
+              </span>
+              <span className="font-headline font-black text-6xl text-on-primary-fixed">
+                {stats.organized}
+              </span>
             </div>
             <div className="bg-surface-container-low p-8 flex flex-col justify-between border-l border-surface-container-highest">
               <span className="font-sans font-bold text-error uppercase text-xs">No-Shows</span>
-              <span className="font-headline font-black text-6xl text-white">{String(stats.noShows).padStart(2, '0')}</span>
+              <span className="font-headline font-black text-6xl text-white">
+                {String(stats.noShows).padStart(2, '0')}
+              </span>
             </div>
           </div>
         )}
@@ -154,19 +173,30 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-1">
             {history.map((item, idx) => (
-              <div key={idx} className="bg-surface-container-low p-4 flex items-center gap-6 opacity-60 hover:opacity-100 transition-all cursor-pointer group">
+              <div
+                key={idx}
+                className="bg-surface-container-low p-4 flex items-center gap-6 opacity-60 hover:opacity-100 transition-all cursor-pointer group"
+              >
                 <div className="text-center min-w-[60px]">
-                  <div className="font-headline font-black text-xl leading-none">{item.date.split('-')[2] ?? '--'}</div>
-                  <div className="font-sans text-[10px] uppercase font-bold text-on-surface-variant">{item.date.split('-')[1] ?? ''}</div>
+                  <div className="font-headline font-black text-xl leading-none">
+                    {item.date.split('-')[2] ?? '--'}
+                  </div>
+                  <div className="font-sans text-[10px] uppercase font-bold text-on-surface-variant">
+                    {item.date.split('-')[1] ?? ''}
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-sm uppercase tracking-tight group-hover:text-primary transition-colors">{item.reta}</h4>
+                  <h4 className="font-bold text-sm uppercase tracking-tight group-hover:text-primary transition-colors">
+                    {item.reta}
+                  </h4>
                   <p className="font-sans text-xs text-on-surface-variant">{item.sport}</p>
                 </div>
-                <span className={cn(
-                  'text-[10px] font-black px-2 py-1 uppercase italic',
-                  'bg-primary-container text-on-primary-fixed',
-                )}>
+                <span
+                  className={cn(
+                    'text-[10px] font-black px-2 py-1 uppercase italic',
+                    'bg-primary-container text-on-primary-fixed',
+                  )}
+                >
                   {item.result}
                 </span>
                 <ChevronRight className="w-4 h-4 text-outline group-hover:text-primary transition-colors" />

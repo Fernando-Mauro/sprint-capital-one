@@ -10,7 +10,10 @@ export default function TopNav() {
   return (
     <header className="bg-background flex justify-between items-center w-full px-4 h-16 fixed top-0 z-50 border-b border-surface-container-highest">
       <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="font-headline font-black uppercase tracking-tighter text-2xl italic text-primary">
+        <Link
+          href="/dashboard"
+          className="font-headline font-black uppercase tracking-tighter text-2xl italic text-primary"
+        >
           MATCHUP
         </Link>
       </div>

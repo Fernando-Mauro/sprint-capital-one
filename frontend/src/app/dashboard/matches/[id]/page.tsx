@@ -58,7 +58,9 @@ export default function MatchDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-pulse font-headline font-black text-2xl text-on-surface-variant">CARGANDO...</div>
+        <div className="animate-pulse font-headline font-black text-2xl text-on-surface-variant">
+          CARGANDO...
+        </div>
       </div>
     );
   }
@@ -66,8 +68,12 @@ export default function MatchDetailPage() {
   if (!reta) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="font-headline font-black text-3xl text-on-surface-variant">RETA NO ENCONTRADA</p>
-        <Link href="/dashboard" className="text-primary font-bold uppercase">Volver</Link>
+        <p className="font-headline font-black text-3xl text-on-surface-variant">
+          RETA NO ENCONTRADA
+        </p>
+        <Link href="/dashboard" className="text-primary font-bold uppercase">
+          Volver
+        </Link>
       </div>
     );
   }
@@ -85,7 +91,10 @@ export default function MatchDetailPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         <div className="absolute top-4 left-4">
-          <Link href="/dashboard" className="text-white hover:bg-surface-container/50 transition-colors p-2 inline-block">
+          <Link
+            href="/dashboard"
+            className="text-white hover:bg-surface-container/50 transition-colors p-2 inline-block"
+          >
             <ArrowLeft className="w-6 h-6" />
           </Link>
         </div>
@@ -103,7 +112,10 @@ export default function MatchDetailPage() {
             </div>
             <div className="flex items-center gap-2">
               <Clock className="text-primary w-5 h-5" />
-              <span>{reta.start_time}{reta.end_time ? ` - ${reta.end_time}` : ''}</span>
+              <span>
+                {reta.start_time}
+                {reta.end_time ? ` - ${reta.end_time}` : ''}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="text-primary w-5 h-5" />
@@ -119,25 +131,36 @@ export default function MatchDetailPage() {
           {/* Description */}
           {reta.description && (
             <section>
-              <h3 className="font-headline font-black uppercase text-2xl mb-4 border-l-4 border-primary pl-4">DESCRIPCIÓN</h3>
-              <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl">{reta.description}</p>
+              <h3 className="font-headline font-black uppercase text-2xl mb-4 border-l-4 border-primary pl-4">
+                DESCRIPCIÓN
+              </h3>
+              <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl">
+                {reta.description}
+              </p>
             </section>
           )}
 
           {/* Players */}
           <section>
             <div className="flex justify-between items-end mb-6">
-              <h3 className="font-headline font-black uppercase text-2xl border-l-4 border-primary pl-4">JUGADORES CONFIRMADOS</h3>
+              <h3 className="font-headline font-black uppercase text-2xl border-l-4 border-primary pl-4">
+                JUGADORES CONFIRMADOS
+              </h3>
               <span className="font-headline font-black text-primary text-xl">
                 {confirmedPlayers.length}/{reta.max_players}
               </span>
             </div>
             {confirmedPlayers.length === 0 ? (
-              <p className="text-on-surface-variant font-bold">Nadie se ha unido aún. ¡Sé el primero!</p>
+              <p className="text-on-surface-variant font-bold">
+                Nadie se ha unido aún. ¡Sé el primero!
+              </p>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {confirmedPlayers.map((player, idx) => (
-                  <div key={player.id} className="bg-surface-container-low flex items-center p-2 pr-4 gap-3 border-b-2 border-outline-variant hover:border-primary transition-all">
+                  <div
+                    key={player.id}
+                    className="bg-surface-container-low flex items-center p-2 pr-4 gap-3 border-b-2 border-outline-variant hover:border-primary transition-all"
+                  >
                     <div className="w-10 h-10 bg-surface-container-highest flex items-center justify-center border border-outline">
                       <span className="text-xs font-black text-primary">
                         {player.users?.username?.charAt(0).toUpperCase() ?? `P${idx + 1}`}
@@ -165,7 +188,9 @@ export default function MatchDetailPage() {
           <div className="aspect-video bg-surface-container-high relative overflow-hidden group cursor-pointer">
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <MapPin className="text-4xl text-primary-container mb-2 w-10 h-10" />
-              <p className="font-headline font-black uppercase text-sm tracking-widest">{reta.location_name}</p>
+              <p className="font-headline font-black uppercase text-sm tracking-widest">
+                {reta.location_name}
+              </p>
             </div>
           </div>
 
@@ -176,7 +201,9 @@ export default function MatchDetailPage() {
               <span className="w-2 h-2 bg-primary rounded-full" />
             </div>
             <div className="flex-1 p-4 overflow-y-auto flex items-center justify-center">
-              <p className="text-on-surface-variant text-xs font-bold uppercase">Chat próximamente</p>
+              <p className="text-on-surface-variant text-xs font-bold uppercase">
+                Chat próximamente
+              </p>
             </div>
             <div className="p-4 bg-surface-container-lowest flex gap-2">
               <input
@@ -195,7 +222,9 @@ export default function MatchDetailPage() {
           {/* Organizer Tools */}
           {isOrganizer && reta.status !== 'cancelled' && (
             <div className="p-6 bg-surface-container-high border-2 border-dashed border-outline-variant space-y-4">
-              <p className="font-headline font-black uppercase text-xs text-on-surface-variant tracking-widest">HERRAMIENTAS DE ORGANIZADOR</p>
+              <p className="font-headline font-black uppercase text-xs text-on-surface-variant tracking-widest">
+                HERRAMIENTAS DE ORGANIZADOR
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={handleCancel}
@@ -217,7 +246,9 @@ export default function MatchDetailPage() {
       {reta.status !== 'cancelled' && (
         <div className="fixed bottom-0 left-0 w-full z-[60] bg-surface-container-high/90 backdrop-blur-xl border-t border-outline-variant p-4 md:p-6 flex items-center justify-between">
           <div className="hidden md:block">
-            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">ESTADO DE LA RETA</p>
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+              ESTADO DE LA RETA
+            </p>
             <p className="font-headline font-black uppercase text-2xl tracking-tighter">
               {reta.current_players >= reta.max_players ? 'COMPLETA' : 'ÚLTIMOS LUGARES'}
             </p>
