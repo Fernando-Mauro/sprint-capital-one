@@ -1,9 +1,10 @@
 'use client';
 
+import LocationPicker from '@/components/map/LocationPicker';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { createMatch, getSports } from '@/services/matches';
-import { ArrowLeft, Calendar, Globe, Lock, MapPin } from 'lucide-react';
+import { ArrowLeft, Calendar, Globe, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,7 +19,9 @@ export default function CreateMatchPage() {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationName, setLocationName] = useState('');
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const [maxPlayers, setMaxPlayers] = useState(12);
   const [level, setLevel] = useState('');
   const [description, setDescription] = useState('');
@@ -42,6 +45,10 @@ export default function CreateMatchPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (!latitude || !longitude) {
+      setError('Selecciona una ubicación en el mapa');
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -49,9 +56,9 @@ export default function CreateMatchPage() {
       {
         title,
         sport_id: selectedSport,
-        location_name: location,
-        latitude: 0,
-        longitude: 0,
+        location_name: locationName,
+        latitude,
+        longitude,
         date,
         start_time: startTime,
         max_players: maxPlayers,
@@ -72,11 +79,10 @@ export default function CreateMatchPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-12">
-      {/* Top */}
       <div className="flex items-center gap-4">
         <Link
           href="/dashboard"
-          className="text-white hover:bg-surface-container transition-colors p-2"
+          className="text-white hover:bg-surface-container transition-colors p-2 cursor-pointer"
         >
           <ArrowLeft className="w-6 h-6" />
         </Link>
@@ -110,7 +116,7 @@ export default function CreateMatchPage() {
                 type="button"
                 onClick={() => setSelectedSport(sport.id)}
                 className={cn(
-                  'flex items-center gap-2 px-6 py-3 font-black uppercase text-sm border-2 transition-all active:scale-95',
+                  'flex items-center gap-2 px-6 py-3 font-black uppercase text-sm border-2 transition-all active:scale-95 cursor-pointer',
                   selectedSport === sport.id
                     ? 'bg-primary-container text-on-primary-fixed border-primary-container'
                     : 'bg-surface-container text-on-surface border-transparent hover:border-outline-variant',
@@ -164,22 +170,21 @@ export default function CreateMatchPage() {
               required
             />
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
-              Cancha / Ubicación
-            </label>
-            <div className="relative">
-              <input
-                className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-lg font-bold uppercase placeholder:text-surface-container-highest focus:border-primary-container focus:outline-none"
-                placeholder="BUSCAR CANCHA..."
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-              />
-              <MapPin className="absolute right-0 top-4 text-primary pointer-events-none w-5 h-5" />
-            </div>
-          </div>
+        </section>
+
+        {/* Location Picker */}
+        <section>
+          <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
+            Cancha / Ubicación
+          </label>
+          <LocationPicker
+            value={locationName}
+            onChange={({ name, latitude: lat, longitude: lng }) => {
+              setLocationName(name);
+              setLatitude(lat);
+              setLongitude(lng);
+            }}
+          />
         </section>
 
         {/* Settings */}
@@ -217,7 +222,7 @@ export default function CreateMatchPage() {
                   type="button"
                   onClick={() => setLevel(lvl)}
                   className={cn(
-                    'flex-1 py-3 text-xs font-black uppercase transition-all',
+                    'flex-1 py-3 text-xs font-black uppercase transition-all cursor-pointer',
                     level === lvl
                       ? 'bg-primary-container text-on-primary-fixed'
                       : 'text-on-surface-variant hover:text-white',
@@ -264,7 +269,7 @@ export default function CreateMatchPage() {
               type="button"
               onClick={() => setIsPublic(!isPublic)}
               className={cn(
-                'w-14 h-8 relative flex items-center px-1 transition-colors',
+                'w-14 h-8 relative flex items-center px-1 transition-colors cursor-pointer',
                 isPublic ? 'bg-primary-container' : 'bg-surface-container-highest',
               )}
             >
@@ -283,7 +288,7 @@ export default function CreateMatchPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-primary to-primary-container py-6 text-on-primary-fixed font-headline font-black text-2xl uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_40px_rgba(0,253,134,0.2)] disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-primary to-primary-container py-6 text-on-primary-fixed font-headline font-black text-2xl uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_40px_rgba(0,253,134,0.2)] disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'CREANDO...' : 'CREAR MATCHUP'}
           </button>
