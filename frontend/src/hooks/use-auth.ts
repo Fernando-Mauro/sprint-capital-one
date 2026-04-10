@@ -32,26 +32,32 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+  const fetchProfile = useCallback(
+    async (
+      userId: string,
+      authUser?: {
+        email?: string | null;
+        user_metadata?: Record<string, unknown> | null;
+      } | null,
+    ) => {
+      const { data } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
 
-    if (data) {
-      setUser(data as UserProfile);
-      return;
-    }
+      if (data) {
+        setUser(data as UserProfile);
+        return;
+      }
 
-    // Auto-create profile for OAuth users (Google) who don't have one yet
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-    if (authUser) {
+      // Auto-create profile for OAuth users (Google) who don't have one yet.
+      // Use authUser from the caller instead of supabase.auth.getUser() to
+      // avoid triggering a TOKEN_REFRESHED → onAuthStateChange → fetchProfile
+      // infinite loop.
+      if (!authUser) return;
+
       const email = authUser.email ?? '';
+      const metadata = authUser.user_metadata ?? {};
       const fullName =
-        authUser.user_metadata?.full_name ??
-        authUser.user_metadata?.name ??
-        email.split('@')[0] ??
-        '';
-      const sanitizedName = (fullName as string)
+        (metadata.full_name as string) ?? (metadata.name as string) ?? email.split('@')[0] ?? '';
+      const sanitizedName = fullName
         .toLowerCase()
         .replace(/[^a-z0-9_]/g, '')
         .slice(0, 30);
@@ -63,8 +69,8 @@ export function useAuth(): AuthState {
           id: userId,
           email,
           username,
-          full_name: fullName as string,
-          avatar_url: (authUser.user_metadata?.avatar_url as string) ?? null,
+          full_name: fullName,
+          avatar_url: (metadata.avatar_url as string) ?? null,
         })
         .select()
         .maybeSingle();
@@ -72,16 +78,20 @@ export function useAuth(): AuthState {
       if (newProfile) {
         setUser(newProfile as UserProfile);
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
+    let lastHandledUserId: string | null = null;
+
     const getSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (session?.user) {
-        await fetchProfile(session.user.id);
+        lastHandledUserId = session.user.id;
+        await fetchProfile(session.user.id, session.user);
       }
       setLoading(false);
     };
@@ -89,13 +99,26 @@ export function useAuth(): AuthState {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      } else {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only react to actual sign in/out — ignore TOKEN_REFRESHED and
+      // INITIAL_SESSION which can fire in loops and cause infinite refetches.
+      if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') return;
+
+      if (!session?.user) {
         setUser(null);
+        lastHandledUserId = null;
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      // Skip if we already handled this user (prevents re-fetch loops)
+      if (lastHandledUserId === session.user.id) {
+        setLoading(false);
+        return;
+      }
+
+      lastHandledUserId = session.user.id;
+      fetchProfile(session.user.id, session.user).finally(() => setLoading(false));
     });
 
     return () => subscription.unsubscribe();
