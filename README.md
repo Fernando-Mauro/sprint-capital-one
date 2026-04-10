@@ -29,6 +29,14 @@ Live demo: [matchup deployment on Vercel]
 
 ---
 
+## How we used AI
+
+Given the limited time-frame, we felt that the best way to implement all of our desired functionality was AI-assisted Engineering. As such, we followed several procedures to ensure the quality of our code was as neat as possible.
+
+Firstly, we created 11 different types of agents: backend-specialist, ci-local-runner, db-migrations, documentation, frontend-specialist, performance, pr-review, security-plus-rls, testing, ui-design, and master-orchestration. Each one of these serves a specialized role summarized by their name. In particular, the master orchestrator is the main agent, who is in charge of determining the task at hand and giving the tasks to parallel subagents of the types required for said task.
+
+As such, we could review and create in mass amounts, however, this still implied certain risks when merging, which is why we also utilized AI to create a CI pipeline for automated tests, linting, and type control, in order to ensure that nothing would break with our merges. So, after the AI reviews the code, The pipeline checks for errors, then a human reviews the changes and approves, effectively completing our appropriate development cycle.
+
 ## Tech Stack
 
 ### Core
