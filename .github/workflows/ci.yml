@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  ci:
+    name: Lint, Type Check, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint --max-warnings 0
+
+      - name: Type Check
+        run: pnpm typecheck
+
+      - name: File Length Check
+        run: bash scripts/check-file-length.sh
+
+      - name: Format Check
+        run: pnpm format:check
+
+      - name: Unit Tests
+        run: pnpm test -- --coverage
+
+      - name: Build
+        run: pnpm build
