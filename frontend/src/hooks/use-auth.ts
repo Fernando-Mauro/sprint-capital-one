@@ -8,15 +8,22 @@ import type { UserProfile } from '@/types';
 interface AuthState {
   user: UserProfile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (
+    email: string,
+    password: string,
+    captchaToken?: string,
+  ) => Promise<{ error: string | null }>;
   signUp: (
     email: string,
     password: string,
     username: string,
     fullName: string,
+    captchaToken?: string,
   ) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string, captchaToken?: string) => Promise<{ error: string | null }>;
+  updatePassword: (password: string) => Promise<{ error: string | null }>;
 }
 
 export function useAuth(): AuthState {
@@ -93,13 +100,27 @@ export function useAuth(): AuthState {
     return () => subscription.unsubscribe();
   }, [supabase, fetchProfile]);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const signIn = async (email: string, password: string, captchaToken?: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: captchaToken ? { captchaToken } : undefined,
+    });
     return { error: error?.message ?? null };
   };
 
-  const signUp = async (email: string, password: string, username: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  const signUp = async (
+    email: string,
+    password: string,
+    username: string,
+    fullName: string,
+    captchaToken?: string,
+  ) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: captchaToken ? { captchaToken } : undefined,
+    });
     if (error) return { error: error.message };
 
     if (data.user) {
@@ -130,5 +151,27 @@ export function useAuth(): AuthState {
     window.location.href = '/login';
   };
 
-  return { user, loading, signIn, signUp, signInWithGoogle, signOut };
+  const resetPassword = async (email: string, captchaToken?: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+      captchaToken,
+    });
+    return { error: error?.message ?? null };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error?.message ?? null };
+  };
+
+  return {
+    user,
+    loading,
+    signIn,
+    signUp,
+    signInWithGoogle,
+    signOut,
+    resetPassword,
+    updatePassword,
+  };
 }
