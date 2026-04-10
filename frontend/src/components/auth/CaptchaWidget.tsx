@@ -1,6 +1,10 @@
 'use client';
 
-import { Turnstile } from '@marsidev/react-turnstile';
+import HCaptchaRaw from '@hcaptcha/react-hcaptcha';
+import { useRef } from 'react';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HCaptcha = HCaptchaRaw as any;
 
 interface CaptchaWidgetProps {
   onSuccess: (token: string) => void;
@@ -8,23 +12,21 @@ interface CaptchaWidgetProps {
   onExpire?: () => void;
 }
 
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TurnstileComponent = Turnstile as any;
+const SITE_KEY =
+  process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
 export default function CaptchaWidget({ onSuccess, onError, onExpire }: CaptchaWidgetProps) {
+  const captchaRef = useRef<HCaptchaRaw>(null);
+
   return (
     <div className="flex justify-center">
-      <TurnstileComponent
-        siteKey={SITE_KEY}
-        onSuccess={onSuccess}
+      <HCaptcha
+        ref={captchaRef}
+        sitekey={SITE_KEY}
+        theme="dark"
+        onVerify={onSuccess}
         onError={onError}
         onExpire={onExpire}
-        options={{
-          theme: 'dark',
-          size: 'flexible',
-        }}
       />
     </div>
   );
