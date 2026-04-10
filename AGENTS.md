@@ -1,429 +1,551 @@
-# AGENTS.md - AI Agent Knowledge Base for Altheia
+# AGENTS.md — AI Agent Knowledge Base for MatchUp
 
-This document contains critical knowledge about the Altheia codebase to help AI agents work effectively on this project.
+> **Every agent MUST read this file before making any changes to the codebase.**
+
+---
 
 ## Project Overview
 
-**Altheia** is an educational platform for students and teachers, built with:
-- **Frontend**: React 18 + TypeScript + Vite
-- **UI**: Tailwind CSS + shadcn/ui components
-- **Backend**: Supabase (PostgreSQL + Auth + RLS)
-- **Routing**: React Router with HashRouter
+**MatchUp** is a pick-up match organizer app that lets users create, discover, and join casual sports matches in their area. Built with:
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Backend / Auth / DB**: Supabase (PostgreSQL + Auth + RLS + Realtime)
+- **File Storage**: AWS S3 (profile pictures, match media)
+- **Unit Testing**: Jest + React Testing Library
+- **E2E Testing**: Playwright
+- **Deployment**: Vercel
+- **Package Manager**: pnpm
+
+---
 
 ## Project Structure
 
 ```
-src/
-├── components/
-│   ├── student/          # Student-facing components (Dashboard, Profile, Leaderboard)
-│   ├── teacher/          # Teacher-facing components (Dashboard, Groups, Stats)
-│   ├── subject/          # Subject-related (Problems, Flashcards, Practice Tests)
-│   ├── group/            # Group management (GroupViewPage, JoinGroupPage)
-│   ├── settings/         # User settings tabs
-│   ├── pages/            # Standalone pages (ErroresPage)
-│   └── ui/               # shadcn/ui components
-├── contexts/
-│   ├── AuthContext.tsx   # User authentication state
-│   └── SubjectColorsContext.tsx
-├── services/
-│   ├── database.ts       # Supabase queries (problems, errors, subjects)
-│   └── activity.ts       # User activity tracking, stats, streaks
-├── lib/
-│   ├── supabase.ts       # Supabase client configuration
-│   └── security.ts       # Input sanitization utilities
-└── hooks/                # Custom React hooks
+/
+├── AGENTS.md                      # THIS FILE — read before every task
+├── README.md                      # Project readme & setup guide
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI pipeline (lint, type-check, test, build)
+├── scripts/
+│   └── check-file-length.sh       # Enforces max 500 lines per file
+├── frontend/                      # Next.js application
+│   ├── src/
+│   │   ├── app/                   # Next.js App Router pages & API routes
+│   │   │   ├── globals.css        # Tailwind imports + CSS custom properties
+│   │   │   ├── layout.tsx         # Root layout (providers, fonts)
+│   │   │   ├── page.tsx           # Landing / home page
+│   │   │   ├── (auth)/
+│   │   │   │   ├── login/page.tsx
+│   │   │   │   └── register/page.tsx
+│   │   │   ├── (dashboard)/
+│   │   │   │   ├── layout.tsx     # Dashboard shell (sidebar, nav)
+│   │   │   │   ├── page.tsx       # Dashboard home (upcoming matches)
+│   │   │   │   ├── matches/
+│   │   │   │   │   ├── page.tsx   # Browse / search matches
+│   │   │   │   │   ├── create/page.tsx
+│   │   │   │   │   └── [id]/page.tsx  # Match detail
+│   │   │   │   └── profile/
+│   │   │   │       └── page.tsx   # User profile
+│   │   │   └── api/
+│   │   │       ├── matches/route.ts   # Match CRUD API
+│   │   │       ├── upload/route.ts    # S3 presigned URL generation
+│   │   │       └── webhooks/
+│   │   │           └── supabase/route.ts  # Supabase webhook handler
+│   │   ├── components/
+│   │   │   ├── ui/                # Shared UI primitives (buttons, inputs, cards)
+│   │   │   ├── matches/           # Match-specific components
+│   │   │   ├── auth/              # Auth forms, guards
+│   │   │   └── layout/            # Nav, sidebar, footer
+│   │   ├── hooks/
+│   │   │   ├── use-auth.ts        # Authentication hook
+│   │   │   ├── use-matches.ts     # Match data hooks
+│   │   │   └── use-upload.ts      # S3 upload hook
+│   │   ├── services/
+│   │   │   ├── matches.ts         # Match CRUD operations
+│   │   │   ├── users.ts           # User profile operations
+│   │   │   ├── upload.ts          # S3 file upload logic
+│   │   │   └── notifications.ts   # Notification service
+│   │   ├── lib/
+│   │   │   ├── supabase/
+│   │   │   │   ├── client.ts      # Browser Supabase client
+│   │   │   │   ├── server.ts      # Server-side Supabase client
+│   │   │   │   ├── middleware.ts   # Supabase auth middleware helpers
+│   │   │   │   └── types.ts       # Generated DB types (from supabase gen types)
+│   │   │   ├── s3/
+│   │   │   │   └── client.ts      # AWS S3 client configuration
+│   │   │   └── utils.ts           # General utility functions
+│   │   ├── types/
+│   │   │   ├── index.ts           # Barrel export for all types
+│   │   │   ├── matches.ts         # Match domain types
+│   │   │   └── database.ts        # Database row/insert/update types
+│   │   └── middleware.ts           # Next.js middleware (auth redirect)
+│   └── tests/
+│       ├── unit/
+│       │   └── services/          # Unit tests for service layer
+│       │       └── matches.test.ts
+│       └── e2e/
+│           └── matches.spec.ts    # Playwright E2E tests
+├── backend/                       # Database & server-side config
+│   └── supabase/
+│       ├── migrations/            # SQL migration files
+│       │   └── 00001_initial_schema.sql
+│       └── seed.sql               # Development seed data
+├── public/                        # Static assets
+├── next.config.ts
+├── tsconfig.json
+├── package.json
+├── pnpm-lock.yaml
+├── jest.config.ts
+├── playwright.config.ts
+├── eslint.config.mjs
+├── postcss.config.mjs
+├── .prettierrc
+├── .env.example
+└── .gitignore
 ```
 
-## Critical React Patterns
+---
 
-### ⚠️ MUST: Define useCallback BEFORE useEffect
+## Clean Code Guidelines
 
-JavaScript temporal dead zone causes `ReferenceError` if useCallback is defined after useEffect that references it.
+### 1. File Length Limit — MAX 500 LINES
+
+No source file may exceed **500 lines** (excluding blank lines and comments in the count is optional, but the raw file must stay ≤ 500 lines). If a file approaches this limit, **split it**:
+
+- Extract sub-components into their own files.
+- Move helper functions to `src/lib/utils.ts` or a dedicated utility module.
+- Split large service files by domain responsibility.
+
+**CI enforces this** — the `check-file-length.sh` script will fail the build if any `.ts` or `.tsx` file in `src/` exceeds 500 lines.
+
+### 2. Linting — ESLint (Strict)
+
+We use ESLint flat config (`eslint.config.mjs`) with the following rulesets:
+
+| Ruleset | Purpose |
+|---------|---------|
+| `@typescript-eslint/recommended-type-checked` | Type-aware TS rules |
+| `@typescript-eslint/strict-type-checked` | Strict TS rules (no `any`, no unsafe assignments) |
+| `eslint-plugin-import` | Import ordering & restrictions |
+| `eslint-plugin-react` + `eslint-plugin-react-hooks` | React best practices |
+| `eslint-plugin-jsx-a11y` | Accessibility |
+| `@next/eslint-plugin-next` | Next.js specific rules |
+
+**Key rules:**
+- **`no-explicit-any`**: NEVER use `any`. Use `unknown` and narrow, or define proper types.
+- **`no-unused-vars`**: No dead code. Prefix unused params with `_` if unavoidable.
+- **`consistent-type-imports`**: Always use `import type` for type-only imports.
+- **`no-console`**: Use a proper logger or remove before committing. `console.error` is allowed in catch blocks only.
+
+### 3. TypeScript — Strict Mode
+
+`tsconfig.json` enables:
+```json
+{
+  "strict": true,
+  "noUncheckedIndexedAccess": true,
+  "noImplicitReturns": true,
+  "noFallthroughCasesInSwitch": true,
+  "forceConsistentCasingInFileNames": true,
+  "exactOptionalPropertyTypes": true
+}
+```
+
+**Rules:**
+- All function parameters and return types MUST be explicitly typed (no inferred `any`).
+- All API responses MUST be validated with a schema (Zod recommended).
+- Never use `as` type assertions unless absolutely necessary — prefer type guards.
+- Use `satisfies` operator for type checking object literals.
+
+### 4. Import Rules — No Deep Internal Imports
+
+Imports must follow these rules:
 
 ```tsx
-// ❌ WRONG - Will crash with "can't access lexical declaration before initialization"
-useEffect(() => {
-  loadData();
-}, [loadData]);
+// ❌ FORBIDDEN — deep internal import reaching into a module's internals
+import { formatDate } from '../../lib/utils/date/formatters';
 
-const loadData = useCallback(async () => { ... }, []);
+// ✅ CORRECT — import from the module's public barrel export
+import { formatDate } from '@/lib/utils';
 
-// ✅ CORRECT - Define useCallback first
-const loadData = useCallback(async () => { ... }, []);
+// ❌ FORBIDDEN — relative imports that go up more than one level
+import { Button } from '../../../components/ui/Button';
 
-useEffect(() => {
-  loadData();
-}, [loadData]);
+// ✅ CORRECT — always use the path alias
+import { Button } from '@/components/ui/Button';
 ```
 
-### ⚠️ Avoid Infinite Loops with User Dependency
+**Rules:**
+1. **Always use `@/` path alias** — no `../` beyond one level up.
+2. **Barrel exports** — Each module directory should have an `index.ts` that re-exports its public API.
+3. **No circular dependencies** — ESLint `import/no-cycle` is enabled.
+4. **Import order** (enforced by ESLint):
+   1. Node built-ins (`node:fs`, `node:path`)
+   2. External packages (`react`, `next`, `@supabase/supabase-js`)
+   3. Internal aliases (`@/lib/`, `@/services/`, `@/components/`)
+   4. Relative imports (`./`, `../`)
+   5. Type imports (always last, with `import type`)
 
-Using `user` object as dependency causes infinite re-renders because the object reference changes. Use `user?.id` instead.
+### 5. Naming Conventions
+
+| Entity | Convention | Example |
+|--------|-----------|---------|
+| Files (components) | `kebab-case.tsx` | `match-card.tsx` |
+| Files (utilities) | `kebab-case.ts` | `date-utils.ts` |
+| Files (types) | `kebab-case.ts` | `matches.ts` |
+| React components | `PascalCase` | `MatchCard` |
+| Functions / hooks | `camelCase` | `useMatches`, `formatDate` |
+| Constants | `UPPER_SNAKE_CASE` | `MAX_PLAYERS`, `API_BASE_URL` |
+| Types / Interfaces | `PascalCase` | `Match`, `CreateMatchInput` |
+| Enums | `PascalCase` (members `PascalCase`) | `MatchStatus.Completed` |
+| Database columns | `snake_case` | `created_at`, `player_count` |
+| Environment variables | `UPPER_SNAKE_CASE` | `NEXT_PUBLIC_SUPABASE_URL` |
+
+### 6. Component Guidelines
+
+- **Functional components only** — no class components.
+- **One component per file** — exception: small tightly-coupled sub-components.
+- **Props via interface** — always define a `Props` interface (or `ComponentNameProps`).
+- **No inline styles** — use Tailwind classes or CSS modules.
+- **Server Components by default** — only add `'use client'` when truly needed (state, effects, browser APIs).
+- **Colocation** — keep component-specific utils and types close to the component.
+
+### 7. Error Handling
+
+- **Service layer**: Always return `{ data, error }` tuples — never throw from services.
+- **API routes**: Use consistent error response format: `{ error: string, code: string }`.
+- **Components**: Use React Error Boundaries for rendering errors.
+- **Async operations**: Always handle both success and failure paths.
 
 ```tsx
-// ❌ WRONG - Causes infinite loop
-const loadData = useCallback(async () => {
-  if (!user) return;
-  // ...
-}, [user]);  // user object reference changes every render
+// ✅ Service pattern
+export async function getMatch(id: string): Promise<ServiceResult<Match>> {
+  // TODO: implement
+}
 
-// ✅ CORRECT - Use primitive value
-const loadData = useCallback(async () => {
-  if (!user) return;
-  // ...
-}, [user?.id]);  // string is stable
+// ✅ API route pattern
+export async function GET(request: Request): Promise<Response> {
+  // TODO: implement with proper try/catch and status codes
+}
 ```
 
-### ⚠️ Topic Filter Re-render Issue
+### 8. Git & Branch Conventions
 
-The TopicFilter component uses `useRef` to prevent re-loading when user clicks options:
-- `hasAutoSelected` ref prevents multiple auto-selections
-- `onSelectionChangeRef` ref avoids callback dependency issues
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production — deployed to Vercel |
+| `develop` | Integration branch — PRs merge here first |
+| `feature/<name>` | New features |
+| `fix/<name>` | Bug fixes |
+| `chore/<name>` | Config, deps, docs |
 
-### ⚠️ Authentication & Back Button Protection
+- All PRs require passing CI checks.
+- All PRs require at least 1 review.
+- Squash merge to keep history clean.
+- Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`.
 
-**CRITICAL**: Prevent users from seeing protected content after logout via back button spam.
+---
 
-**Multi-layered defense:**
-1. **GlobalAuthBlocker** (App.tsx wrapper) - Synchronously checks localStorage for auth token before rendering anything. Returns `null` if no valid token (prevents ANY flash of content).
-2. **ProtectedRoute** - Second layer that validates session via Supabase API.
-3. **Logout force reload** - Uses `window.location.href = '/#/'` to completely clear React state and browser history.
+## Database Schema
 
-Key files:
-- [GlobalAuthBlocker.tsx](src/components/GlobalAuthBlocker.tsx) - Outer defense layer
-- [ProtectedRoute.tsx](src/components/ProtectedRoute.tsx) - Inner auth validation with 500ms interval checks
-- [AuthContext.tsx](src/contexts/AuthContext.tsx) - Clears localStorage token before signOut
-
-**Implementation pattern:**
-```tsx
-// In App.tsx
-<AuthProvider>
-  <GlobalAuthBlocker>
-    {/* All routes */}
-  </GlobalAuthBlocker>
-</AuthProvider>
-
-// In logout function
-const logout = async () => {
-  // 1. Clear localStorage token FIRST
-  const storageKey = Object.keys(localStorage).find(key => 
-    key.startsWith('sb-') && key.endsWith('-auth-token')
-  );
-  if (storageKey) localStorage.removeItem(storageKey);
-  
-  // 2. Sign out from Supabase
-  await supabase.auth.signOut();
-  
-  // 3. Force full page reload
-  window.location.href = '/#/';
-};
-```
-
-## Database Patterns
-
-### Supabase Environments
-
-- **DEV**: `jkbuowdbmvhrqmynturh.supabase.co`
-- **PROD**: `htikohojkylebqwtvxhx.supabase.co`
-
-Environment is controlled via `.env` file with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-
-### Checking for Existing Records
-
-Use `.maybeSingle()` instead of `.single()` when checking if a record exists:
-
-```tsx
-// ❌ WRONG - Throws error when no row found
-const { data: existing } = await supabase
-  .from('errors')
-  .select('id')
-  .eq('user_id', userId)
-  .single();  // Throws PGRST116 error if not found
-
-// ✅ CORRECT - Returns null when no row found
-const { data: existing } = await supabase
-  .from('errors')
-  .select('id')
-  .eq('user_id', userId)
-  .maybeSingle();  // Returns null gracefully
-```
-
-### Key Tables
+### Tables
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
-| `users` | User profiles (students/teachers) | `id`, `email`, `role`, `points`, `avatar_url`, `institution_id` |
-| `groups` | Teacher-created study groups | `id`, `name`, `teacher_id`, `subject_id`, `institution_id` |
-| `group_members` | Student-group associations | `id`, `group_id`, `student_id` |
-| `group_teachers` | Teacher-group associations | `id`, `group_id`, `teacher_id` |
-| `group_invitations` | Group invite tokens | `id`, `group_id`, `token`, `invited_email`, `expires_at` |
-| `teachers` | Teacher-subject assignments | `id`, `user_id`, `subject_id` |
-| `subjects` | Available subjects | `id`, `name`, `code`, `level`, `color` |
-| `topics` | Subject topic organization | `id`, `subject_id`, `order_id`, `name` |
-| `assessments` | Practice test definitions | `id`, `name`, `subject_id`, `duration`, `total_marks` |
-| `problems` | Practice problems | `id`, `question`, `options`, `correct_answer`, `marks`, `topic_id`, `is_multipart`, `image_url` |
-| `problem_subparts` | Multi-part problem components | `id`, `problem_id`, `part_label`, `question_text`, `marks` |
-| `flashcards` | Study flashcards | `id`, `subject_id`, `topic_id`, `question`, `answer`, `order_id` |
-| `errors` | Wrong answers tracked per user | `id`, `user_id`, `problem_id`, `user_answer` |
-| `bookmarks` | User bookmarks | `id`, `user_id`, `content_type`, `content_id`, `subject_id` |
-| `practice_test_sessions` | Completed test records | `id`, `user_id`, `subject_id`, `group_id`, `correct_answers`, `score`, `total_time_seconds` |
-| `user_activity` | Daily activity tracking | `id`, `user_id`, `date`, `points_earned`, `practice_tests_completed`, `total_time_seconds` |
-| `user_streaks` | Streak tracking | `user_id`, `current_streak`, `max_streak`, `last_activity_date` |
-| `user_preferences` | User UI settings (theme, colors) | `user_id`, `theme`, `accent_color` |
-| `activities` | Teacher-assigned activities | `id`, `title`, `type`, `subject_id`, `group_id`, `teacher_id`, `due_date` |
-| `student_progress` | Student activity completion | `id`, `student_id`, `activity_id`, `score`, `completed` |
-| `institutions` | Institution accounts | `id`, `name`, `license_type`, `max_teachers`, `max_students` |
-| `suggestions` | User feedback/bug reports | `id`, `user_id`, `type`, `title`, `description`, `status` |
+| `users` | User profiles | `id`, `email`, `display_name`, `avatar_url`, `bio`, `location`, `created_at` |
+| `matches` | Pick-up match events | `id`, `organizer_id` (FK→users), `title`, `sport`, `location_name`, `latitude`, `longitude`, `starts_at`, `ends_at`, `max_players`, `status`, `description`, `image_url`, `created_at` |
+| `match_participants` | Users joined to matches | `id`, `match_id` (FK→matches), `user_id` (FK→users), `status` (joined/waitlisted/cancelled), `joined_at` |
+| `match_messages` | In-match chat | `id`, `match_id` (FK→matches), `user_id` (FK→users), `content`, `created_at` |
+| `sports` | Sport types | `id`, `name`, `icon`, `default_player_count` |
+| `notifications` | User notifications | `id`, `user_id` (FK→users), `type`, `title`, `body`, `data` (jsonb), `read`, `created_at` |
+| `media` | Uploaded images/files | `id`, `user_id` (FK→users), `match_id` (FK→matches, nullable), `s3_key`, `url`, `type` (avatar/match_photo), `created_at` |
 
-### RLS Policies
+### Enums
 
-All tables use Row-Level Security. Users can only access their own data or data from groups they belong to.
+```sql
+CREATE TYPE match_status AS ENUM ('draft', 'open', 'full', 'in_progress', 'completed', 'cancelled');
+CREATE TYPE participant_status AS ENUM ('joined', 'waitlisted', 'cancelled');
+CREATE TYPE notification_type AS ENUM ('match_joined', 'match_cancelled', 'match_starting', 'match_full', 'new_message');
+```
+
+### Key RLS Policies
+
+- **users**: Users can read any profile; can only update their own.
+- **matches**: Anyone authenticated can read; only organizer can update/delete.
+- **match_participants**: Users can read participants of matches they belong to; can insert/delete their own participation.
+- **match_messages**: Only participants of a match can read/write messages.
+- **media**: Users can read all media; can only insert/delete their own.
+
+### Supabase Client Pattern
+
+```tsx
+// ❌ WRONG — throws error when no row found
+const { data } = await supabase.from('matches').select('*').eq('id', id).single();
+
+// ✅ CORRECT — returns null gracefully
+const { data } = await supabase.from('matches').select('*').eq('id', id).maybeSingle();
+```
+
+---
 
 ## Key Services
 
-### `services/database.ts`
+### `services/matches.ts`
+- `getMatches(filters)` — Fetch matches with optional filters (sport, location, date)
+- `getMatchById(id)` — Single match with participants
+- `createMatch(input)` — Create new match
+- `updateMatch(id, input)` — Update match details
+- `cancelMatch(id)` — Soft cancel a match
+- `joinMatch(matchId, userId)` — Join / waitlist for a match
+- `leaveMatch(matchId, userId)` — Leave a match
 
-- `getProblemById(id)` - Fetch problem with subparts
-- `addError(userId, problemId, answer)` - Track wrong answer (checks for duplicates)
-- `removeError(userId, problemId)` - Remove from error tracking
-- `getErrorsByUser(userId)` - Get all user's wrong answers
-- `isOpenEnded(problem)` - Check if problem has no options (open-ended)
+### `services/users.ts`
+- `getUserProfile(id)` — Fetch user profile
+- `updateUserProfile(id, input)` — Update profile fields
+- `getUserMatches(userId)` — Matches a user has joined/organized
 
-### `services/activity.ts`
+### `services/upload.ts`
+- `generatePresignedUrl(key, contentType)` — Get S3 presigned upload URL
+- `deleteFile(key)` — Remove file from S3
+- `getPublicUrl(key)` — Get CDN/public URL for a file
 
-- `getUserStats(userId)` - Returns `UserStats` with time, accuracy, streaks
-- `getUserActivity(userId, days)` - Daily activity points
-- `getPracticeTestSessions(userId, days)` - Test history
-- `recordPracticeTestSession(...)` - Save completed test
-- `incrementDailyActivity(userId, addTime, addPoints, ...)` - Add to daily totals (called by `recordPracticeTestSession`)
+### `services/notifications.ts`
+- `getNotifications(userId)` — Fetch user notifications
+- `markAsRead(notificationIds)` — Mark notifications read
+- `createNotification(input)` — Create notification (internal use)
 
-**⚠️ Streak Calculation**: Uses integer date subtraction (`p_activity_date - last_activity`) for accurate day counting.
-- `days_diff = 0` → Same day (no change)
-- `days_diff = 1` → Consecutive day (increment streak)
-- `days_diff > 1` → Streak broken (reset to 1)
+---
 
-### `services/userPreferences.ts`
+## Authentication Flow
 
-- `getUserPreferences(userId)` - Fetch user UI preferences from database
-- `updateUserPreferences(userId, preferences)` - Upsert theme/colors
-- `updateThemePreference(userId, theme)` - Update only theme
-- `updateSubjectColors(userId, colors)` - Update only subject colors
+1. **Sign up / Sign in** via Supabase Auth (email + password, OAuth providers).
+2. **Session management** handled by Supabase SSR helpers in `middleware.ts`.
+3. **Middleware** (`src/middleware.ts`) checks session on every request:
+   - No session + protected route → redirect to `/login`
+   - Valid session + auth route → redirect to `/dashboard`
+4. **Server Components** use `createServerClient()` from `@/lib/supabase/server`.
+5. **Client Components** use `createBrowserClient()` from `@/lib/supabase/client`.
 
-**Cross-device sync**: Preferences are synced via `PreferencesSync` component that loads on login and saves on change.
+---
 
-## Open-Ended Questions
+## AWS S3 Integration
 
-Problems without `options` are considered open-ended and use self-grading:
+- **Bucket**: One bucket with prefixes: `avatars/`, `matches/`
+- **Upload flow**:
+  1. Client requests presigned URL from `/api/upload`
+  2. API validates auth, generates presigned PUT URL (5 min TTL)
+  3. Client uploads directly to S3 via presigned URL
+  4. Client confirms upload → save S3 key to database
+- **Access**: Public read via CloudFront CDN (or S3 public access w/ bucket policy)
+- **Allowed types**: `image/jpeg`, `image/png`, `image/webp` — max 5MB
+- **Key format**: `{type}/{userId}/{uuid}.{ext}` (e.g., `avatars/abc123/def456.webp`)
 
-1. User submits answer
-2. System shows explanation (not correct answer)
-3. User self-grades (0 to max marks)
-4. Score is recorded
+---
 
-Check for open-ended: `problem.options === null`
+## Environment Variables
 
-## Common TypeScript Interfaces
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=           # Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=      # Supabase anonymous key
+SUPABASE_SERVICE_ROLE_KEY=          # Server-only: service role key
 
-```typescript
-interface UserStats {
-  total_time_seconds: number;
-  total_correct_answers: number;
-  total_problems_attempted: number;
-  max_streak: number;
-  current_streak: number;
-  accuracy_percentage: number;
-}
+# AWS S3
+AWS_S3_BUCKET_NAME=                 # S3 bucket name
+AWS_S3_REGION=                      # e.g., us-east-1
+AWS_ACCESS_KEY_ID=                  # IAM user access key
+AWS_SECRET_ACCESS_KEY=              # IAM user secret key
 
-interface Problem {
-  id: string;
-  question: string;
-  options: Record<string, string> | null;  // null = open-ended
-  correct_answer: string;
-  explanation?: string;
-  marks: number;
-  is_multipart: boolean;
-  subparts?: ProblemSubpart[];
-}
+# App
+NEXT_PUBLIC_APP_URL=                # e.g., https://matchup.vercel.app
+NEXT_PUBLIC_CDN_URL=                # CloudFront or S3 public URL
 ```
+
+> **NEVER commit `.env.local`** — only `.env.example` is tracked.
+
+---
 
 ## Commands
 
 ```bash
 # Development
-npm run dev              # Start dev server
+pnpm dev                             # Start dev server (http://localhost:3000)
+pnpm build                           # Production build
+pnpm start                           # Start production server
 
-# Linting & Type Checking
-npm run lint             # ESLint check
-npx tsc --noEmit --project tsconfig.app.json  # TypeScript check
+# Quality
+pnpm lint                            # ESLint check
+pnpm lint:fix                        # ESLint auto-fix
+pnpm typecheck                       # TypeScript strict check (tsc --noEmit)
+pnpm format                          # Prettier format
+pnpm format:check                    # Prettier check (CI)
 
-# Combined check (add to package.json)
-npm run check            # "eslint . && tsc --noEmit --project tsconfig.app.json"
+# Testing
+pnpm test                            # Run Jest unit tests
+pnpm test:watch                      # Jest in watch mode
+pnpm test:coverage                   # Jest with coverage report
+pnpm test:e2e                        # Run Playwright E2E tests
+pnpm test:e2e:ui                     # Playwright with UI mode
 
-# Build
-npm run build            # Production build
+# Database
+pnpm db:generate-types               # Generate Supabase TypeScript types
+pnpm db:migrate                      # Run Supabase migrations locally
+pnpm db:seed                         # Seed local database
+pnpm db:reset                        # Reset local database
+
+# CI validation (run before pushing)
+pnpm validate                        # lint + typecheck + test + build
 ```
 
-## Routes (HashRouter)
+---
 
-| Path | Component | Description |
-|------|-----------|-------------|
-| `/` | LoginForm/RegisterForm | Auth pages |
-| `/student/dashboard` | StudentDashboard | Student home |
-| `/teacher/dashboard` | TeacherDashboard | Teacher home |
-| `/materias` | SubjectsPage | Subject selection |
-| `/subject/:subjectId` | SubjectDashboard | Subject home |
-| `/subject/:subjectId/problems/:assessmentId` | AssessmentProblemsView | Test setup |
-| `/subject/:subjectId/problems/:assessmentId/test` | PracticeTestPage | Active test |
-| `/subject/:subjectId/problems/:assessmentId/results` | PracticeTestResultsPage | Test results |
-| `/subject/:subjectId/material` | MaterialPage | Study materials |
-| `/errores` | ErroresPage | Wrong answer review |
-| `/settings` | SettingsPage | User settings |
-| `/teacher/group/:groupId` | GroupViewPage | Group management |
-| `/join/:token` | JoinGroupPage | Group invitation |
+## CI Pipeline
 
-## Known ESLint Warnings (Safe to Ignore)
+All checks must pass before a PR can be merged. The pipeline runs on every push and PR to `main` and `develop`:
 
-These warnings are harmless:
-- `react-refresh/only-export-components` - Only affects HMR
-- `user` dependency warnings - We intentionally use `user?.id` instead
+1. **Lint** — `pnpm lint` (ESLint flat config, zero warnings policy)
+2. **Type Check** — `pnpm typecheck` (strict TypeScript, no emit)
+3. **File Length** — `scripts/check-file-length.sh` (no file > 500 lines)
+4. **Unit Tests** — `pnpm test` (Jest, coverage thresholds)
+5. **Build** — `pnpm build` (Next.js production build must succeed)
+6. **E2E Tests** — `pnpm test:e2e` (Playwright against preview deploy)
 
-## Deployment Notes
+---
 
-1. Ensure `.env` points to correct Supabase instance
-2. Run `npm run build` to create production build
-3. Build output is in `dist/` folder
-4. Uses HashRouter so works with static hosting (GitHub Pages, etc.)
+## Common TypeScript Interfaces
 
-## Database Content Workflow (DEV → PROD)
+```typescript
+interface Match {
+  id: string;
+  organizer_id: string;
+  title: string;
+  sport: string;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  starts_at: string;
+  ends_at: string;
+  max_players: number;
+  status: MatchStatus;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+}
 
-When adding new content (problems, flashcards, subjects, etc.) to test in DEV then push to PROD:
+type MatchStatus = 'draft' | 'open' | 'full' | 'in_progress' | 'completed' | 'cancelled';
 
-### 1. Add Content in DEV
-- Add your content via the app UI or SQL Editor in DEV Supabase dashboard
-- Test thoroughly to ensure everything works
+interface MatchParticipant {
+  id: string;
+  match_id: string;
+  user_id: string;
+  status: ParticipantStatus;
+  joined_at: string;
+}
 
-### 2. Export Content from DEV
-```bash
-# Export specific content tables (exclude user data)
-# IMPORTANT: Use UTF-8 encoding to preserve special characters (ñ, ó, equations, etc.)
-npx supabase db dump --data-only --schema public \
-  --exclude auth.users,public.users,public.groups,public.group_members,\
-public.errors,public.practice_test_sessions,public.user_activity,public.user_streaks,\
-public.bookmarks,public.teachers \
-  --project-ref jkbuowdbmvhrqmynturh | Out-File -Encoding UTF8 content_export.sql
+type ParticipantStatus = 'joined' | 'waitlisted' | 'cancelled';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  display_name: string;
+  avatar_url: string | null;
+  bio: string | null;
+  location: string | null;
+  created_at: string;
+}
+
+interface CreateMatchInput {
+  title: string;
+  sport: string;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  starts_at: string;
+  ends_at: string;
+  max_players: number;
+  description?: string;
+}
+
+interface ServiceResult<T> {
+  data: T | null;
+  error: string | null;
+}
 ```
 
-**For Windows PowerShell, use:** `| Out-File -Encoding UTF8 content_export.sql`  
-**For Unix/Mac/WSL, use:** `> content_export.sql` (UTF-8 by default)
+---
 
-### 3. Review Export
-- Open `content_export.sql` and verify:
-  - Only content tables are included (subjects, topics, assessments, problems, flashcards)
-  - No user-specific data
-  - No test/development records you don't want in production
-  - **Special characters display correctly** (ñ, á, é, í, ó, ú, ¿, ¡, etc.)
-  - **Mathematical equations/LaTeX render properly** (check KaTeX syntax)
+## Common Patterns
 
-### 4. Import to PROD
-```bash
-# Apply to PROD database
-npx supabase db push --db-url "postgresql://postgres:[PASSWORD]@[PROD_HOST]:5432/postgres" \
-  --file content_export.sql
+### React Hooks — Define `useCallback` BEFORE `useEffect`
+
+```tsx
+// ❌ WRONG — ReferenceError: can't access before initialization
+useEffect(() => { loadData(); }, [loadData]);
+const loadData = useCallback(async () => { /* ... */ }, []);
+
+// ✅ CORRECT
+const loadData = useCallback(async () => { /* ... */ }, []);
+useEffect(() => { loadData(); }, [loadData]);
 ```
 
-OR use SQL Editor on PROD dashboard:
-1. Open the SQL file in a UTF-8 compatible editor (VS Code, not Notepad)
-2. Copy and paste the content
-3. Verify special characters display correctly in the editor before running
+### Avoid Object Dependencies in Hooks
 
-### 5. Verify
-- Check PROD database that content appeared correctly
-- **Specifically verify special characters:** ñ, á, é, í, ó, ú, mathematical symbols
-- **Test equations render properly** in the app (KaTeX)
-- Test the new content in PROD app
+```tsx
+// ❌ WRONG — user object reference changes every render → infinite loop
+const loadData = useCallback(() => { /* ... */ }, [user]);
 
-**Important Notes:**
-- Always exclude user tables when exporting content
-- **Use UTF-8 encoding at every step** to preserve special characters and equations
-- If using Supabase Dashboard SQL Editor, it handles UTF-8 automatically
-- If characters appear corrupted (� or ????), re-export with proper UTF-8 encoding
-- Spanish content requires UTF-8: letters like ñ, á, é, í, ó, ú must survive the export/import
-- Use `--exclude` flag to prevent copying user data
-- Review the dump file before importing to PROD
-- Make database schema changes (migrations) separately from content
+// ✅ CORRECT — use primitive value
+const loadData = useCallback(() => { /* ... */ }, [user?.id]);
+```
+
+### Server vs Client Component Decision Tree
+
+```
+Does this component need:
+  ├─ useState / useEffect / useReducer? → 'use client'
+  ├─ Browser APIs (window, document)?   → 'use client'
+  ├─ Event handlers (onClick, etc.)?    → 'use client'
+  ├─ Third-party client-only library?   → 'use client'
+  └─ None of the above?                 → Server Component (default)
+```
+
+---
+
+## Security Requirements
+
+- **All tables use RLS** — no exceptions.
+- **Validate all inputs** server-side using Zod schemas.
+- **Sanitize user-generated content** before rendering.
+- **Presigned URLs** for S3 — never expose AWS credentials to the client.
+- **Rate limiting** on API routes (consider `@upstash/ratelimit`).
+- **CSRF protection** handled by Supabase Auth cookies + Next.js middleware.
+- **Environment variables** — never prefix server-only secrets with `NEXT_PUBLIC_`.
+
+---
+
+## Deployment (Vercel)
+
+1. Connect GitHub repo to Vercel project.
+2. Set environment variables in Vercel dashboard.
+3. Build command: `pnpm build`
+4. Output directory: `.next` (auto-detected)
+5. Framework preset: Next.js
+6. Branch deploys:
+   - `main` → Production
+   - `develop` → Preview
+   - Feature branches → Preview
+
+---
 
 ## Common Bugs & Fixes
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| Page loads then unloads repeatedly | `user` object in dependencies | Use `user?.id` instead |
-| "can't access lexical declaration" | useEffect before useCallback | Reorder: useCallback first |
-| Duplicate errors in database | Using `.single()` for existence check | Use `.maybeSingle()` |
-| TopicFilter flashes on click | Dependencies causing reload | Use refs for callbacks |
-| 404 on test results | Wrong route path in navigate | Match route definition |
-| Teacher Material tab redirects to dashboard | Missing record in `teachers` table | Ensure teacher has entry in `teachers` table with `subject_id` |
-| Back button shows content after logout | React state persists in browser | GlobalAuthBlocker + localStorage check + force reload |
-| Streak counter shows 1 but calendar shows multiple days | Date comparison using INTERVAL | Use integer date subtraction (`date1 - date2`) |
-
-## Style System
-
-Uses CSS custom properties defined in `index.css`:
-- `--color-teal`: Primary accent
-- `--color-gold`: Secondary accent
-- `--color-red`: Error/destructive
-- `--bg-primary`, `--bg-secondary`: Backgrounds
-- `--text-primary`, `--text-secondary`: Text colors
-
-Theme switching handled by `ThemeProvider` with dark/light modes.
-## LaTeX Rendering
-
-### LatexText Component
-Located at `src/components/ui/LatexText.tsx`. This shared component handles:
-- `$...$` inline math and `$$...$$` display math
-- Converts `\(...\)` to `$...$` and `\[...\]` to `$$...$$`
-- Converts `**text**` markdown to `<strong>text</strong>`
-- Uses react-katex with KaTeX CSS for rendering
-
-### Problem Options with Images
-Problems can have image-based options instead of text. The options field structure:
-```typescript
-// Text option
-options: { "a": "Answer text", "b": "Another answer" }
-
-// Image option
-options: { 
-  "a": { "type": "image", "url": "https://...supabase.co/storage/.../image.png" },
-  "b": { "type": "image", "url": "..." }
-}
-```
-
-Check for image options: `typeof value === 'object' && value?.type === 'image'`
-
-### Problem Images (question images)
-Problems can have an `image_url` field for images that appear in the question itself.
-Images are stored in Supabase Storage bucket `problem-images`.
-
-## Content Migration Scripts
-
-### `scripts/parse_problems.py`
-Parses Markdown files (e.g., `Problemas P1-A.md`) and generates SQL insert statements.
-
-**Key features:**
-- Converts `\_X` subscripts to `$X_{subscript}$`
-- Converts Unicode superscripts `²³⁴` to `^{2}^{3}^{4}`
-- Handles accented subscripts with `\text{}`
-- Generates full Supabase Storage URLs for images
-- Uses `$json$...$json$::jsonb` dollar-quoting for safe JSON insertion
-
-**Usage:**
-```bash
-python scripts/parse_problems.py
-# Outputs to: sql/insert_paper1a_problems.sql
-```
-
-**Topic Mapping:** The parser uses a hardcoded `TOPIC_MAP` dictionary mapping topic order_id (0-25) to UUIDs.
-
-### Supabase Storage for Images
-- **Bucket**: `problem-images` (public)
-- **URL format**: `https://{project}.supabase.co/storage/v1/object/public/problem-images/{filename}.png`
-- Images are named by problem ID (e.g., `01-05-03-01.png`)
+| Infinite re-render | Object in useCallback deps | Use `obj?.id` (primitive) instead |
+| "can't access lexical declaration" | useEffect before useCallback | Move useCallback above useEffect |
+| Supabase `.single()` throws PGRST116 | No row found | Use `.maybeSingle()` instead |
+| S3 upload 403 | Wrong IAM policy or expired presigned URL | Check bucket policy + URL TTL |
+| Middleware redirect loop | Missing matcher config | Add `matcher` array to `middleware.ts` config |
+| Hydration mismatch | Server/client render different content | Ensure consistent rendering or use `suppressHydrationWarning` |
