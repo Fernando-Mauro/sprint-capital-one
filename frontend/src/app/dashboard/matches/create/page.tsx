@@ -157,11 +157,7 @@ export default function CreateMatchPage() {
             <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
               Hora de Inicio
             </label>
-            <InteractiveTimePicker
-              value={startTime}
-              onChange={setStartTime}
-              required
-            />
+            <InteractiveTimePicker value={startTime} onChange={setStartTime} required />
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">

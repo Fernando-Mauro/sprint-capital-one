@@ -5,7 +5,13 @@ import MatchHero from '@/components/matches/MatchHero';
 import OrganizerTools from '@/components/matches/OrganizerTools';
 import PlayersList from '@/components/matches/PlayersList';
 import { useAuth } from '@/hooks/use-auth';
-import { getMatchById, joinMatch, leaveMatch, cancelMatch, completeMatch } from '@/services/matches';
+import {
+  getMatchById,
+  joinMatch,
+  leaveMatch,
+  cancelMatch,
+  completeMatch,
+} from '@/services/matches';
 import { MapPin, Share } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -86,7 +92,7 @@ export default function MatchDetailPage() {
         text: `¡Únete a mi matchup: ${reta?.title}!`,
         url: window.location.href,
       });
-    } catch (err) {
+    } catch (_err) {
       void navigator.clipboard.writeText(window.location.href);
       alert('Link copiado al portapapeles');
     }
@@ -155,15 +161,19 @@ export default function MatchDetailPage() {
           {/* Chat System */}
           <ChatWindow retaId={reta.id} user={user} />
 
-          <button 
-             onClick={handleShare}
-             className="w-full bg-surface-container-high border-2 border-outline-variant hover:border-primary text-on-surface font-headline font-black uppercase text-sm py-4 flex items-center justify-center gap-3 transition-colors cursor-pointer"
+          <button
+            onClick={handleShare}
+            className="w-full bg-surface-container-high border-2 border-outline-variant hover:border-primary text-on-surface font-headline font-black uppercase text-sm py-4 flex items-center justify-center gap-3 transition-colors cursor-pointer"
           >
             <Share className="w-5 h-5" /> COMPARTIR MATCHUP
           </button>
 
           {isOrganizer && reta.status !== 'cancelled' && (
-            <OrganizerTools onCancel={handleCancel} onComplete={handleComplete} disabled={actionLoading} />
+            <OrganizerTools
+              onCancel={handleCancel}
+              onComplete={handleComplete}
+              disabled={actionLoading}
+            />
           )}
         </aside>
       </div>

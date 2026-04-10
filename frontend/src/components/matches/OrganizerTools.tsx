@@ -22,7 +22,7 @@ export default function OrganizerTools({ onCancel, onComplete, disabled }: Organ
         >
           <Trash2 className="w-4 h-4" /> CANCELAR
         </button>
-        <button 
+        <button
           onClick={onComplete}
           disabled={disabled}
           className="border-2 border-primary text-primary font-headline font-black uppercase text-xs p-3 hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
