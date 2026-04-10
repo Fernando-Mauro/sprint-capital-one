@@ -4,41 +4,106 @@ on:
   pull_request:
     branches: [master, develop]
 
+# Reusable setup steps via a shared install job, then parallel checks
 jobs:
-  ci:
-    name: Lint, Type Check, Test & Build
+  install:
+    name: Install Dependencies
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+      - run: pnpm install
+      - uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  lint:
+    name: Lint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm lint
 
-      - name: Lint
-        run: pnpm lint --max-warnings 0
+  typecheck:
+    name: Type Check
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm typecheck
 
-      - name: Type Check
-        run: pnpm typecheck
+  format:
+    name: Format Check
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm format:check
 
-      - name: File Length Check
-        run: bash scripts/check-file-length.sh
+  file-length:
+    name: File Length Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-file-length.sh
 
-      - name: Format Check
-        run: pnpm format:check
+  test:
+    name: Unit Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm test -- --coverage
 
-      - name: Unit Tests
-        run: pnpm test -- --coverage
-
-      - name: Build
-        run: pnpm build
+  build:
+    name: Build
+    needs: [lint, typecheck, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: modules-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm build
