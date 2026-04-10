@@ -20,6 +20,7 @@ export default function MatchDetailPage() {
   const [reta, setReta] = useState<(Reta & { reta_players: RetaPlayer[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [message, setMessage] = useState('');
 
   const loadReta = useCallback(async () => {
@@ -36,9 +37,35 @@ export default function MatchDetailPage() {
   const isOrganizer = reta?.organizer_id === user?.id;
   const confirmedPlayers = reta?.reta_players?.filter((p) => p.status === 'confirmed') ?? [];
 
-  const handleAction = async (action: () => Promise<unknown>) => {
+  const handleJoin = async () => {
+    if (!user || !reta) return;
     setActionLoading(true);
-    await action();
+    setActionError(null);
+    const result = await joinMatch(reta.id, user.id);
+    if (result.error) {
+      setActionError(result.error);
+    }
+    await loadReta();
+    setActionLoading(false);
+  };
+
+  const handleLeave = async () => {
+    if (!user || !reta) return;
+    setActionLoading(true);
+    setActionError(null);
+    const result = await leaveMatch(reta.id, user.id);
+    if (result.error) {
+      setActionError(result.error);
+    }
+    await loadReta();
+    setActionLoading(false);
+  };
+
+  const handleCancel = async () => {
+    if (!reta) return;
+    setActionLoading(true);
+    setActionError(null);
+    await cancelMatch(reta.id);
     await loadReta();
     setActionLoading(false);
   };
@@ -72,6 +99,13 @@ export default function MatchDetailPage() {
 
       <div className="px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-12">
+          {/* Error feedback */}
+          {actionError && (
+            <div className="bg-error/10 border border-error text-error text-sm font-bold p-3">
+              {actionError}
+            </div>
+          )}
+
           {reta.description && (
             <section>
               <h3 className="font-headline font-black uppercase text-2xl mb-4 border-l-4 border-primary pl-4">
@@ -87,7 +121,6 @@ export default function MatchDetailPage() {
         </div>
 
         <aside className="lg:col-span-4 space-y-6">
-          {/* Map Placeholder */}
           <div className="aspect-video bg-surface-container-high relative overflow-hidden group cursor-pointer">
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <MapPin className="text-4xl text-primary-container mb-2 w-10 h-10" />
@@ -97,7 +130,6 @@ export default function MatchDetailPage() {
             </div>
           </div>
 
-          {/* Chat Placeholder */}
           <section className="bg-surface-container flex flex-col h-[400px] border border-outline-variant">
             <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
               <h3 className="font-headline font-black uppercase tracking-tight">CHAT DE LA RETA</h3>
@@ -116,17 +148,14 @@ export default function MatchDetailPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-              <button className="bg-primary-container text-on-primary-container px-4 hover:bg-primary transition-colors">
+              <button className="bg-primary-container text-on-primary-container px-4 hover:bg-primary transition-colors cursor-pointer">
                 <Send className="w-4 h-4" />
               </button>
             </div>
           </section>
 
           {isOrganizer && reta.status !== 'cancelled' && (
-            <OrganizerTools
-              onCancel={() => handleAction(() => cancelMatch(reta.id))}
-              disabled={actionLoading}
-            />
+            <OrganizerTools onCancel={handleCancel} disabled={actionLoading} />
           )}
         </aside>
       </div>
@@ -138,8 +167,8 @@ export default function MatchDetailPage() {
         isParticipant={isParticipant}
         isOrganizer={isOrganizer ?? false}
         loading={actionLoading}
-        onJoin={() => user && handleAction(() => joinMatch(reta.id, user.id))}
-        onLeave={() => user && handleAction(() => leaveMatch(reta.id, user.id))}
+        onJoin={handleJoin}
+        onLeave={handleLeave}
       />
     </div>
   );

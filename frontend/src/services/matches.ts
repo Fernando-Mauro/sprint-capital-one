@@ -3,7 +3,9 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import type { Reta, RetaPlayer, ServiceResult } from '@/types';
 import type { CreateMatchInput, UpdateMatchInput } from '@/types/matches';
 
-const supabase = createBrowserClient();
+function getSupabase() {
+  return createBrowserClient();
+}
 
 interface MatchFilters {
   sport_id?: string;
@@ -11,6 +13,7 @@ interface MatchFilters {
 }
 
 export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<Reta[]>> {
+  const supabase = getSupabase();
   let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true });
 
   if (filters?.sport_id) {
@@ -28,6 +31,7 @@ export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<
 export async function getMatchById(
   id: string,
 ): Promise<ServiceResult<Reta & { reta_players: RetaPlayer[] }>> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('retas')
     .select('*, sports(*), reta_players(*, users(*))')
@@ -43,6 +47,7 @@ export async function createMatch(
   input: CreateMatchInput,
   organizerId: string,
 ): Promise<ServiceResult<Reta>> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('retas')
     .insert({
@@ -56,12 +61,18 @@ export async function createMatch(
   if (error) return { data: null, error: error.message };
 
   // Auto-join as organizer
-  await supabase.from('reta_players').insert({
+  const { error: joinError } = await supabase.from('reta_players').insert({
     reta_id: data.id,
     user_id: organizerId,
     role: 'organizer',
     status: 'confirmed',
   });
+
+  if (joinError) {
+    // Rollback the reta if join fails
+    await supabase.from('retas').delete().eq('id', data.id);
+    return { data: null, error: joinError.message };
+  }
 
   return { data: data as Reta, error: null };
 }
@@ -70,6 +81,7 @@ export async function updateMatch(
   id: string,
   input: UpdateMatchInput,
 ): Promise<ServiceResult<Reta>> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('retas')
     .update({ ...input, updated_at: new Date().toISOString() })
@@ -85,6 +97,21 @@ export async function joinMatch(
   retaId: string,
   userId: string,
 ): Promise<ServiceResult<RetaPlayer>> {
+  const supabase = getSupabase();
+
+  // Check if reta is full
+  const { data: reta } = await supabase
+    .from('retas')
+    .select('current_players, max_players, status')
+    .eq('id', retaId)
+    .single();
+
+  if (!reta) return { data: null, error: 'Reta no encontrada' };
+  if (reta.status === 'cancelled') return { data: null, error: 'Esta reta fue cancelada' };
+  if (reta.status === 'full') return { data: null, error: 'Esta reta está llena' };
+  if (reta.current_players >= reta.max_players)
+    return { data: null, error: 'No hay lugares disponibles' };
+
   // Check if already joined
   const { data: existing } = await supabase
     .from('reta_players')
@@ -95,6 +122,7 @@ export async function joinMatch(
 
   if (existing) return { data: null, error: 'Ya estás en esta reta' };
 
+  // Insert player
   const { data, error } = await supabase
     .from('reta_players')
     .insert({
@@ -108,24 +136,31 @@ export async function joinMatch(
 
   if (error) return { data: null, error: error.message };
 
-  // Increment current_players
-  const { data: reta } = await supabase
-    .from('retas')
-    .select('current_players')
-    .eq('id', retaId)
-    .single();
-
-  if (reta) {
-    await supabase
-      .from('retas')
-      .update({ current_players: reta.current_players + 1 })
-      .eq('id', retaId);
+  // Increment current_players atomically
+  const newCount = reta.current_players + 1;
+  const updateData: Record<string, unknown> = { current_players: newCount };
+  if (newCount >= reta.max_players) {
+    updateData.status = 'full';
   }
+  await supabase.from('retas').update(updateData).eq('id', retaId);
 
   return { data: data as RetaPlayer, error: null };
 }
 
 export async function leaveMatch(retaId: string, userId: string): Promise<ServiceResult<null>> {
+  const supabase = getSupabase();
+
+  // Don't allow organizer to leave
+  const { data: player } = await supabase
+    .from('reta_players')
+    .select('role')
+    .eq('reta_id', retaId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!player) return { data: null, error: 'No estás en esta reta' };
+  if (player.role === 'organizer') return { data: null, error: 'El organizador no puede salirse' };
+
   const { error } = await supabase
     .from('reta_players')
     .delete()
@@ -137,15 +172,18 @@ export async function leaveMatch(retaId: string, userId: string): Promise<Servic
   // Decrement current_players
   const { data: reta } = await supabase
     .from('retas')
-    .select('current_players')
+    .select('current_players, max_players')
     .eq('id', retaId)
     .single();
 
-  if (reta && (reta.current_players as number) > 0) {
-    await supabase
-      .from('retas')
-      .update({ current_players: (reta.current_players as number) - 1 })
-      .eq('id', retaId);
+  if (reta && reta.current_players > 0) {
+    const newCount = reta.current_players - 1;
+    const updateData: Record<string, unknown> = { current_players: newCount };
+    // Re-open if was full
+    if (newCount < reta.max_players) {
+      updateData.status = 'open';
+    }
+    await supabase.from('retas').update(updateData).eq('id', retaId);
   }
 
   return { data: null, error: null };
@@ -156,6 +194,7 @@ export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
 }
 
 export async function getSports(): Promise<ServiceResult<{ id: string; name: string }[]>> {
+  const supabase = getSupabase();
   const { data, error } = await supabase.from('sports').select('id, name').order('name');
 
   if (error) return { data: null, error: error.message };
