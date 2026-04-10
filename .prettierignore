@@ -1,0 +1,18 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# next.js
+.next
+out
+
+# production
+build
+dist
+
+# lockfiles
+pnpm-lock.yaml
+
+# OS
+.DS_Store
+Thumbs.db
