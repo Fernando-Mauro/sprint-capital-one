@@ -1,14 +1,16 @@
 ---
-description: "Debug and fix a bug by tracing through frontend, backend, and database layers."
-mode: "master-orchestrator"
+description: 'Debug and fix a bug by tracing through frontend, backend, and database layers.'
+mode: 'master-orchestrator'
 ---
 
 # Bug Investigation
 
 ## Symptom
+
 {{ bug_description }}
 
 ## Steps to Reproduce
+
 {{ steps }}
 
 ---
@@ -22,6 +24,7 @@ Please investigate this bug:
 5. **Verify fix** — What tests or checks confirm the fix works?
 
 Common Altheia-specific bugs to check first:
+
 - `user` object in dependency array (causes infinite loops)
 - `useEffect` before `useCallback` (causes ReferenceError)
 - `.single()` instead of `.maybeSingle()` (causes PGRST116)

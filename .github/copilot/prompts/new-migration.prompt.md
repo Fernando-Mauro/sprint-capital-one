@@ -1,6 +1,6 @@
 ---
-description: "Create a new Supabase migration with table, RLS policies, indexes, and the corresponding service layer code."
-mode: "db-migrations-manager"
+description: 'Create a new Supabase migration with table, RLS policies, indexes, and the corresponding service layer code.'
+mode: 'db-migrations-manager'
 ---
 
 # New Database Migration
@@ -8,12 +8,15 @@ mode: "db-migrations-manager"
 ## Table: {{ table_name }}
 
 ### Columns
+
 {{ columns }}
 
 ### Relationships
+
 {{ foreign_keys }}
 
 ### Access Rules
+
 {{ who_can_read_write }}
 
 ---

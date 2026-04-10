@@ -8,16 +8,12 @@ export async function generatePresignedUrl(
   return { data: null, error: 'Not implemented' };
 }
 
-export async function deleteFile(
-  _key: string,
-): Promise<ServiceResult<null>> {
+export async function deleteFile(_key: string): Promise<ServiceResult<null>> {
   // TODO: Delete file from S3 bucket
   return { data: null, error: 'Not implemented' };
 }
 
-export async function getPublicUrl(
-  _key: string,
-): Promise<ServiceResult<{ url: string }>> {
+export async function getPublicUrl(_key: string): Promise<ServiceResult<{ url: string }>> {
   // TODO: Return CDN/public URL for the given S3 key
   return { data: null, error: 'Not implemented' };
 }

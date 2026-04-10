@@ -3,9 +3,7 @@ import { cookies } from 'next/headers';
 
 import type { Database } from '@/lib/supabase/types';
 
-export async function createServerClient(): Promise<
-  ReturnType<typeof createClient<Database>>
-> {
+export async function createServerClient(): Promise<ReturnType<typeof createClient<Database>>> {
   const cookieStore = await cookies();
 
   return createClient<Database>(
