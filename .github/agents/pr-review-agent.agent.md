@@ -1,21 +1,22 @@
 ---
 name: PR Review Agent
-description: "Reviews code for best practices, correctness, security, and consistency before merging in the Altheia project."
-tools: ["codebase", "terminal", "findFiles", "readFile", "editFiles", "problems", "github/*", "agents"]
-agents: ["security-rls-agent", "performance-agent", "testing-agent", "documentation-agent"]
+description: 'Reviews code for best practices, correctness, security, and consistency before merging in the Altheia project.'
+tools:
+  ['codebase', 'terminal', 'findFiles', 'readFile', 'editFiles', 'problems', 'github/*', 'agents']
+agents: ['security-rls-agent', 'performance-agent', 'testing-agent', 'documentation-agent']
 handoffs:
-  - label: "Fix Security Issue"
+  - label: 'Fix Security Issue'
     agent: security-rls-agent
-    prompt: "Fix the security issues identified in the review above."
-  - label: "Fix Performance Issue"
+    prompt: 'Fix the security issues identified in the review above.'
+  - label: 'Fix Performance Issue'
     agent: performance-agent
-    prompt: "Fix the performance issues identified in the review above."
-  - label: "Add Missing Tests"
+    prompt: 'Fix the performance issues identified in the review above.'
+  - label: 'Add Missing Tests'
     agent: testing-agent
-    prompt: "Write tests for the gaps identified in the review above."
-  - label: "Update Docs"
+    prompt: 'Write tests for the gaps identified in the review above.'
+  - label: 'Update Docs'
     agent: documentation-agent
-    prompt: "Update documentation for the changes reviewed above."
+    prompt: 'Update documentation for the changes reviewed above.'
 ---
 
 # PR Review Agent
@@ -112,18 +113,19 @@ Structure reviews like this:
 
 ## Known Bug Patterns to Watch For
 
-| Pattern | Bug | Where to Look |
-|---------|-----|---------------|
-| `useEffect` before `useCallback` | ReferenceError crash | Any component with data fetching |
-| `user` in dependency array | Infinite re-render loop | Any hook using auth context |
-| `.single()` for existence check | PGRST116 error | Service functions |
-| Missing `hasAutoSelected` ref | TopicFilter infinite reload | Topic filter usage |
-| Wrong route in `navigate()` | 404 on navigation | Any component with navigation |
-| Missing `teachers` table entry | Teacher redirect bug | Teacher-specific views |
+| Pattern                          | Bug                         | Where to Look                    |
+| -------------------------------- | --------------------------- | -------------------------------- |
+| `useEffect` before `useCallback` | ReferenceError crash        | Any component with data fetching |
+| `user` in dependency array       | Infinite re-render loop     | Any hook using auth context      |
+| `.single()` for existence check  | PGRST116 error              | Service functions                |
+| Missing `hasAutoSelected` ref    | TopicFilter infinite reload | Topic filter usage               |
+| Wrong route in `navigate()`      | 404 on navigation           | Any component with navigation    |
+| Missing `teachers` table entry   | Teacher redirect bug        | Teacher-specific views           |
 
 ## CI Checks to Verify
 
 Before approving, ensure these pass:
+
 ```bash
 npm run lint            # No ESLint errors
 npx tsc --noEmit --project tsconfig.app.json  # No type errors

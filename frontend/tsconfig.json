@@ -17,10 +17,18 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./frontend/src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"],
-  "exclude": ["node_modules", "frontend/.next"]
+  "include": [
+    "next-env.d.ts",
+    "next.config.ts",
+    "*.config.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }

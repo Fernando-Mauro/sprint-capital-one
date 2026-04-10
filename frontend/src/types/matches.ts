@@ -1,10 +1,4 @@
-export type MatchStatus =
-  | 'draft'
-  | 'open'
-  | 'full'
-  | 'in_progress'
-  | 'completed'
-  | 'cancelled';
+export type MatchStatus = 'draft' | 'open' | 'full' | 'in_progress' | 'completed' | 'cancelled';
 
 export type ParticipantStatus = 'joined' | 'waitlisted' | 'cancelled';
 

@@ -1,18 +1,18 @@
 ---
 name: Frontend Specialist
-description: "Expert in React 18 components, hooks, routing, state management, and TypeScript for the Altheia platform."
-tools: ["codebase", "terminal", "findFiles", "readFile", "editFiles", "problems", "agents"]
-agents: ["backend-specialist", "ui-design-expert", "performance-agent"]
+description: 'Expert in React 18 components, hooks, routing, state management, and TypeScript for the Altheia platform.'
+tools: ['codebase', 'terminal', 'findFiles', 'readFile', 'editFiles', 'problems', 'agents']
+agents: ['backend-specialist', 'ui-design-expert', 'performance-agent']
 handoffs:
-  - label: "Polish UI & Styling"
+  - label: 'Polish UI & Styling'
     agent: ui-design-expert
-    prompt: "Style and polish the components built above."
-  - label: "Write Tests"
+    prompt: 'Style and polish the components built above.'
+  - label: 'Write Tests'
     agent: testing-agent
-    prompt: "Write tests for the components built above."
-  - label: "Review Performance"
+    prompt: 'Write tests for the components built above.'
+  - label: 'Review Performance'
     agent: performance-agent
-    prompt: "Review the components above for re-render issues and performance."
+    prompt: 'Review the components above for re-render issues and performance.'
 ---
 
 # Frontend Specialist Agent
@@ -32,6 +32,7 @@ You are the **Frontend Specialist** for the Altheia educational platform (React 
 ## Critical Patterns (MUST FOLLOW)
 
 ### 1. useCallback BEFORE useEffect
+
 ```tsx
 // ✅ ALWAYS define useCallback before the useEffect that uses it
 const loadData = useCallback(async () => { ... }, [deps]);
@@ -39,6 +40,7 @@ useEffect(() => { loadData(); }, [loadData]);
 ```
 
 ### 2. Use `user?.id` NOT `user` as Dependency
+
 ```tsx
 // ✅ CORRECT — stable primitive
 const loadData = useCallback(async () => { ... }, [user?.id]);
@@ -47,11 +49,14 @@ const loadData = useCallback(async () => { ... }, [user]);
 ```
 
 ### 3. TopicFilter Ref Pattern
+
 The `TopicFilter` component uses `useRef` to prevent re-loading when user clicks:
+
 - `hasAutoSelected` ref prevents multiple auto-selections
 - `onSelectionChangeRef` ref avoids callback dependency issues
 
 ### 4. Authentication Guard
+
 Multi-layered auth: `GlobalAuthBlocker` → `ProtectedRoute` → force reload on logout. Never bypass.
 
 ## Key Files & Structure
@@ -77,21 +82,21 @@ src/
 
 ## Route Definitions
 
-| Path | Component |
-|------|-----------|
-| `/` | LoginForm/RegisterForm |
-| `/student/dashboard` | StudentDashboard |
-| `/teacher/dashboard` | TeacherDashboard |
-| `/materias` | SubjectsPage |
-| `/subject/:subjectId` | SubjectDashboard |
-| `/subject/:subjectId/problems/:assessmentId` | AssessmentProblemsView |
-| `/subject/:subjectId/problems/:assessmentId/test` | PracticeTestPage |
+| Path                                                 | Component               |
+| ---------------------------------------------------- | ----------------------- |
+| `/`                                                  | LoginForm/RegisterForm  |
+| `/student/dashboard`                                 | StudentDashboard        |
+| `/teacher/dashboard`                                 | TeacherDashboard        |
+| `/materias`                                          | SubjectsPage            |
+| `/subject/:subjectId`                                | SubjectDashboard        |
+| `/subject/:subjectId/problems/:assessmentId`         | AssessmentProblemsView  |
+| `/subject/:subjectId/problems/:assessmentId/test`    | PracticeTestPage        |
 | `/subject/:subjectId/problems/:assessmentId/results` | PracticeTestResultsPage |
-| `/subject/:subjectId/material` | MaterialPage |
-| `/errores` | ErroresPage |
-| `/settings` | SettingsPage |
-| `/teacher/group/:groupId` | GroupViewPage |
-| `/join/:token` | JoinGroupPage |
+| `/subject/:subjectId/material`                       | MaterialPage            |
+| `/errores`                                           | ErroresPage             |
+| `/settings`                                          | SettingsPage            |
+| `/teacher/group/:groupId`                            | GroupViewPage           |
+| `/join/:token`                                       | JoinGroupPage           |
 
 ## Common TypeScript Interfaces
 

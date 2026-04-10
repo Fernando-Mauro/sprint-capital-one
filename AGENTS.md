@@ -124,16 +124,17 @@ No source file may exceed **500 lines** (excluding blank lines and comments in t
 
 We use ESLint flat config (`eslint.config.mjs`) with the following rulesets:
 
-| Ruleset | Purpose |
-|---------|---------|
-| `@typescript-eslint/recommended-type-checked` | Type-aware TS rules |
-| `@typescript-eslint/strict-type-checked` | Strict TS rules (no `any`, no unsafe assignments) |
-| `eslint-plugin-import` | Import ordering & restrictions |
-| `eslint-plugin-react` + `eslint-plugin-react-hooks` | React best practices |
-| `eslint-plugin-jsx-a11y` | Accessibility |
-| `@next/eslint-plugin-next` | Next.js specific rules |
+| Ruleset                                             | Purpose                                           |
+| --------------------------------------------------- | ------------------------------------------------- |
+| `@typescript-eslint/recommended-type-checked`       | Type-aware TS rules                               |
+| `@typescript-eslint/strict-type-checked`            | Strict TS rules (no `any`, no unsafe assignments) |
+| `eslint-plugin-import`                              | Import ordering & restrictions                    |
+| `eslint-plugin-react` + `eslint-plugin-react-hooks` | React best practices                              |
+| `eslint-plugin-jsx-a11y`                            | Accessibility                                     |
+| `@next/eslint-plugin-next`                          | Next.js specific rules                            |
 
 **Key rules:**
+
 - **`no-explicit-any`**: NEVER use `any`. Use `unknown` and narrow, or define proper types.
 - **`no-unused-vars`**: No dead code. Prefix unused params with `_` if unavoidable.
 - **`consistent-type-imports`**: Always use `import type` for type-only imports.
@@ -142,6 +143,7 @@ We use ESLint flat config (`eslint.config.mjs`) with the following rulesets:
 ### 3. TypeScript — Strict Mode
 
 `tsconfig.json` enables:
+
 ```json
 {
   "strict": true,
@@ -154,6 +156,7 @@ We use ESLint flat config (`eslint.config.mjs`) with the following rulesets:
 ```
 
 **Rules:**
+
 - All function parameters and return types MUST be explicitly typed (no inferred `any`).
 - All API responses MUST be validated with a schema (Zod recommended).
 - Never use `as` type assertions unless absolutely necessary — prefer type guards.
@@ -178,6 +181,7 @@ import { Button } from '@/components/ui/Button';
 ```
 
 **Rules:**
+
 1. **Always use `@/` path alias** — no `../` beyond one level up.
 2. **Barrel exports** — Each module directory should have an `index.ts` that re-exports its public API.
 3. **No circular dependencies** — ESLint `import/no-cycle` is enabled.
@@ -190,18 +194,18 @@ import { Button } from '@/components/ui/Button';
 
 ### 5. Naming Conventions
 
-| Entity | Convention | Example |
-|--------|-----------|---------|
-| Files (components) | `kebab-case.tsx` | `match-card.tsx` |
-| Files (utilities) | `kebab-case.ts` | `date-utils.ts` |
-| Files (types) | `kebab-case.ts` | `matches.ts` |
-| React components | `PascalCase` | `MatchCard` |
-| Functions / hooks | `camelCase` | `useMatches`, `formatDate` |
-| Constants | `UPPER_SNAKE_CASE` | `MAX_PLAYERS`, `API_BASE_URL` |
-| Types / Interfaces | `PascalCase` | `Match`, `CreateMatchInput` |
-| Enums | `PascalCase` (members `PascalCase`) | `MatchStatus.Completed` |
-| Database columns | `snake_case` | `created_at`, `player_count` |
-| Environment variables | `UPPER_SNAKE_CASE` | `NEXT_PUBLIC_SUPABASE_URL` |
+| Entity                | Convention                          | Example                       |
+| --------------------- | ----------------------------------- | ----------------------------- |
+| Files (components)    | `kebab-case.tsx`                    | `match-card.tsx`              |
+| Files (utilities)     | `kebab-case.ts`                     | `date-utils.ts`               |
+| Files (types)         | `kebab-case.ts`                     | `matches.ts`                  |
+| React components      | `PascalCase`                        | `MatchCard`                   |
+| Functions / hooks     | `camelCase`                         | `useMatches`, `formatDate`    |
+| Constants             | `UPPER_SNAKE_CASE`                  | `MAX_PLAYERS`, `API_BASE_URL` |
+| Types / Interfaces    | `PascalCase`                        | `Match`, `CreateMatchInput`   |
+| Enums                 | `PascalCase` (members `PascalCase`) | `MatchStatus.Completed`       |
+| Database columns      | `snake_case`                        | `created_at`, `player_count`  |
+| Environment variables | `UPPER_SNAKE_CASE`                  | `NEXT_PUBLIC_SUPABASE_URL`    |
 
 ### 6. Component Guidelines
 
@@ -233,13 +237,13 @@ export async function GET(request: Request): Promise<Response> {
 
 ### 8. Git & Branch Conventions
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production — deployed to Vercel |
-| `develop` | Integration branch — PRs merge here first |
-| `feature/<name>` | New features |
-| `fix/<name>` | Bug fixes |
-| `chore/<name>` | Config, deps, docs |
+| Branch           | Purpose                                   |
+| ---------------- | ----------------------------------------- |
+| `master`         | Production — deployed to Vercel           |
+| `develop`        | Integration branch — PRs merge here first |
+| `feature/<name>` | New features                              |
+| `fix/<name>`     | Bug fixes                                 |
+| `chore/<name>`   | Config, deps, docs                        |
 
 - All PRs require passing CI checks.
 - All PRs require at least 1 review.
@@ -252,15 +256,15 @@ export async function GET(request: Request): Promise<Response> {
 
 ### Tables
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `users` | User profiles | `id`, `email`, `display_name`, `avatar_url`, `bio`, `location`, `created_at` |
-| `matches` | Pick-up match events | `id`, `organizer_id` (FK→users), `title`, `sport`, `location_name`, `latitude`, `longitude`, `starts_at`, `ends_at`, `max_players`, `status`, `description`, `image_url`, `created_at` |
-| `match_participants` | Users joined to matches | `id`, `match_id` (FK→matches), `user_id` (FK→users), `status` (joined/waitlisted/cancelled), `joined_at` |
-| `match_messages` | In-match chat | `id`, `match_id` (FK→matches), `user_id` (FK→users), `content`, `created_at` |
-| `sports` | Sport types | `id`, `name`, `icon`, `default_player_count` |
-| `notifications` | User notifications | `id`, `user_id` (FK→users), `type`, `title`, `body`, `data` (jsonb), `read`, `created_at` |
-| `media` | Uploaded images/files | `id`, `user_id` (FK→users), `match_id` (FK→matches, nullable), `s3_key`, `url`, `type` (avatar/match_photo), `created_at` |
+| Table                | Purpose                 | Key Columns                                                                                                                                                                            |
+| -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users`              | User profiles           | `id`, `email`, `display_name`, `avatar_url`, `bio`, `location`, `created_at`                                                                                                           |
+| `matches`            | Pick-up match events    | `id`, `organizer_id` (FK→users), `title`, `sport`, `location_name`, `latitude`, `longitude`, `starts_at`, `ends_at`, `max_players`, `status`, `description`, `image_url`, `created_at` |
+| `match_participants` | Users joined to matches | `id`, `match_id` (FK→matches), `user_id` (FK→users), `status` (joined/waitlisted/cancelled), `joined_at`                                                                               |
+| `match_messages`     | In-match chat           | `id`, `match_id` (FK→matches), `user_id` (FK→users), `content`, `created_at`                                                                                                           |
+| `sports`             | Sport types             | `id`, `name`, `icon`, `default_player_count`                                                                                                                                           |
+| `notifications`      | User notifications      | `id`, `user_id` (FK→users), `type`, `title`, `body`, `data` (jsonb), `read`, `created_at`                                                                                              |
+| `media`              | Uploaded images/files   | `id`, `user_id` (FK→users), `match_id` (FK→matches, nullable), `s3_key`, `url`, `type` (avatar/match_photo), `created_at`                                                              |
 
 ### Enums
 
@@ -293,6 +297,7 @@ const { data } = await supabase.from('matches').select('*').eq('id', id).maybeSi
 ## Key Services
 
 ### `services/matches.ts`
+
 - `getMatches(filters)` — Fetch matches with optional filters (sport, location, date)
 - `getMatchById(id)` — Single match with participants
 - `createMatch(input)` — Create new match
@@ -302,16 +307,19 @@ const { data } = await supabase.from('matches').select('*').eq('id', id).maybeSi
 - `leaveMatch(matchId, userId)` — Leave a match
 
 ### `services/users.ts`
+
 - `getUserProfile(id)` — Fetch user profile
 - `updateUserProfile(id, input)` — Update profile fields
 - `getUserMatches(userId)` — Matches a user has joined/organized
 
 ### `services/upload.ts`
+
 - `generatePresignedUrl(key, contentType)` — Get S3 presigned upload URL
 - `deleteFile(key)` — Remove file from S3
 - `getPublicUrl(key)` — Get CDN/public URL for a file
 
 ### `services/notifications.ts`
+
 - `getNotifications(userId)` — Fetch user notifications
 - `markAsRead(notificationIds)` — Mark notifications read
 - `createNotification(input)` — Create notification (internal use)
@@ -482,22 +490,34 @@ interface ServiceResult<T> {
 
 ```tsx
 // ❌ WRONG — ReferenceError: can't access before initialization
-useEffect(() => { loadData(); }, [loadData]);
-const loadData = useCallback(async () => { /* ... */ }, []);
+useEffect(() => {
+  loadData();
+}, [loadData]);
+const loadData = useCallback(async () => {
+  /* ... */
+}, []);
 
 // ✅ CORRECT
-const loadData = useCallback(async () => { /* ... */ }, []);
-useEffect(() => { loadData(); }, [loadData]);
+const loadData = useCallback(async () => {
+  /* ... */
+}, []);
+useEffect(() => {
+  loadData();
+}, [loadData]);
 ```
 
 ### Avoid Object Dependencies in Hooks
 
 ```tsx
 // ❌ WRONG — user object reference changes every render → infinite loop
-const loadData = useCallback(() => { /* ... */ }, [user]);
+const loadData = useCallback(() => {
+  /* ... */
+}, [user]);
 
 // ✅ CORRECT — use primitive value
-const loadData = useCallback(() => { /* ... */ }, [user?.id]);
+const loadData = useCallback(() => {
+  /* ... */
+}, [user?.id]);
 ```
 
 ### Server vs Client Component Decision Tree
@@ -541,11 +561,11 @@ Does this component need:
 
 ## Common Bugs & Fixes
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Infinite re-render | Object in useCallback deps | Use `obj?.id` (primitive) instead |
-| "can't access lexical declaration" | useEffect before useCallback | Move useCallback above useEffect |
-| Supabase `.single()` throws PGRST116 | No row found | Use `.maybeSingle()` instead |
-| S3 upload 403 | Wrong IAM policy or expired presigned URL | Check bucket policy + URL TTL |
-| Middleware redirect loop | Missing matcher config | Add `matcher` array to `middleware.ts` config |
-| Hydration mismatch | Server/client render different content | Ensure consistent rendering or use `suppressHydrationWarning` |
+| Issue                                | Cause                                     | Fix                                                           |
+| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------- |
+| Infinite re-render                   | Object in useCallback deps                | Use `obj?.id` (primitive) instead                             |
+| "can't access lexical declaration"   | useEffect before useCallback              | Move useCallback above useEffect                              |
+| Supabase `.single()` throws PGRST116 | No row found                              | Use `.maybeSingle()` instead                                  |
+| S3 upload 403                        | Wrong IAM policy or expired presigned URL | Check bucket policy + URL TTL                                 |
+| Middleware redirect loop             | Missing matcher config                    | Add `matcher` array to `middleware.ts` config                 |
+| Hydration mismatch                   | Server/client render different content    | Ensure consistent rendering or use `suppressHydrationWarning` |

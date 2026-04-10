@@ -19,16 +19,12 @@ interface CreateNotificationInput {
   data?: Record<string, unknown> | undefined;
 }
 
-export async function getNotifications(
-  _userId: string,
-): Promise<ServiceResult<Notification[]>> {
+export async function getNotifications(_userId: string): Promise<ServiceResult<Notification[]>> {
   // TODO: Query Supabase for user notifications, ordered by created_at desc
   return { data: null, error: 'Not implemented' };
 }
 
-export async function markAsRead(
-  _notificationIds: string[],
-): Promise<ServiceResult<null>> {
+export async function markAsRead(_notificationIds: string[]): Promise<ServiceResult<null>> {
   // TODO: Update notifications to read = true
   return { data: null, error: 'Not implemented' };
 }
