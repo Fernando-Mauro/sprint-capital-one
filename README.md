@@ -6,6 +6,12 @@ Live demo: [matchup deployment on Vercel]
 
 ---
 
+> **⚠️ Nota sobre los commits y PRs**
+>
+> Por políticas de Vercel, una vez que configuramos el deployment, **solo un miembro del equipo podía crear los pull requests** para que Vercel no marcara errores de permisos al intentar hacer deploy desde cuentas sin acceso al proyecto. Esto significa que aunque los commits y PRs aparezcan hechos por una sola persona en GitHub, **todo el equipo contribuyó de manera equivalente** al código. Cada feature, fix y refactor fue trabajado de manera colaborativa — el nombre en el commit solo refleja quién tuvo que abrir el PR, no quién escribió el código.
+
+---
+
 ## Features
 
 - **Auth flow** — Email/password signup with email confirmation, Google OAuth, password reset, hCaptcha bot protection
