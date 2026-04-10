@@ -39,7 +39,7 @@ export async function getMatchById(
     .maybeSingle();
 
   if (error) return { data: null, error: error.message };
-  if (!data) return { data: null, error: 'Reta no encontrada' };
+  if (!data) return { data: null, error: 'Matchup no encontrado' };
   return { data: data as unknown as Reta & { reta_players: RetaPlayer[] }, error: null };
 }
 
@@ -106,9 +106,9 @@ export async function joinMatch(
     .eq('id', retaId)
     .single();
 
-  if (!reta) return { data: null, error: 'Reta no encontrada' };
-  if (reta.status === 'cancelled') return { data: null, error: 'Esta reta fue cancelada' };
-  if (reta.status === 'full') return { data: null, error: 'Esta reta está llena' };
+  if (!reta) return { data: null, error: 'Matchup no encontrado' };
+  if (reta.status === 'cancelled') return { data: null, error: 'Este matchup fue cancelado' };
+  if (reta.status === 'full') return { data: null, error: 'Este matchup está lleno' };
   if (reta.current_players >= reta.max_players)
     return { data: null, error: 'No hay lugares disponibles' };
 
@@ -120,7 +120,7 @@ export async function joinMatch(
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (existing) return { data: null, error: 'Ya estás en esta reta' };
+  if (existing) return { data: null, error: 'Ya estás en este matchup' };
 
   // Insert player
   const { data, error } = await supabase
@@ -158,7 +158,7 @@ export async function leaveMatch(retaId: string, userId: string): Promise<Servic
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (!player) return { data: null, error: 'No estás en esta reta' };
+  if (!player) return { data: null, error: 'No estás en este matchup' };
   if (player.role === 'organizer') return { data: null, error: 'El organizador no puede salirse' };
 
   const { error } = await supabase

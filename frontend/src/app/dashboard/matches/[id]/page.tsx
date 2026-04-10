@@ -84,7 +84,7 @@ export default function MatchDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="font-headline font-black text-3xl text-on-surface-variant">
-          RETA NO ENCONTRADA
+          MATCHUP NO ENCONTRADO
         </p>
         <Link href="/dashboard" className="text-primary font-bold uppercase">
           Volver
@@ -132,7 +132,9 @@ export default function MatchDetailPage() {
 
           <section className="bg-surface-container flex flex-col h-[400px] border border-outline-variant">
             <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
-              <h3 className="font-headline font-black uppercase tracking-tight">CHAT DE LA RETA</h3>
+              <h3 className="font-headline font-black uppercase tracking-tight">
+                CHAT DEL MATCHUP
+              </h3>
               <span className="w-2 h-2 bg-primary rounded-full" />
             </div>
             <div className="flex-1 p-4 overflow-y-auto flex items-center justify-center">

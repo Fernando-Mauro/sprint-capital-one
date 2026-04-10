@@ -24,7 +24,7 @@ export default function MatchActionBar({
   if (status === 'cancelled') {
     return (
       <div className="fixed bottom-0 left-0 w-full z-[60] bg-error/20 backdrop-blur-xl border-t border-error p-6 text-center">
-        <p className="font-headline font-black uppercase text-2xl text-error">RETA CANCELADA</p>
+        <p className="font-headline font-black uppercase text-2xl text-error">MATCHUP CANCELADO</p>
       </div>
     );
   }
@@ -33,7 +33,7 @@ export default function MatchActionBar({
     <div className="fixed bottom-0 left-0 w-full z-[60] bg-surface-container-high/90 backdrop-blur-xl border-t border-outline-variant p-4 md:p-6 flex items-center justify-between">
       <div className="hidden md:block">
         <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-          ESTADO DE LA RETA
+          ESTADO DEL MATCHUP
         </p>
         <p className="font-headline font-black uppercase text-2xl tracking-tighter">
           {currentPlayers >= maxPlayers ? 'COMPLETA' : 'ÚLTIMOS LUGARES'}

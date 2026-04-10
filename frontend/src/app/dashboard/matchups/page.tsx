@@ -81,7 +81,7 @@ export default function MatchupsPage() {
             <span className="text-tertiary">MATCHUPS</span>
           </h1>
           <p className="font-sans font-bold text-tertiary max-w-xs uppercase tracking-widest text-xs">
-            Tus retas confirmadas.
+            Tus matchups confirmados.
           </p>
         </div>
       </section>
@@ -121,9 +121,9 @@ export default function MatchupsPage() {
         <LoadingSkeleton />
       ) : sortedRetas.length === 0 ? (
         <EmptyState
-          title="No te has unido a ninguna reta"
-          description="Explora retas disponibles y únete a la cancha"
-          actionLabel="Explorar Retas"
+          title="No te has unido a ningún matchup"
+          description="Explora matchups disponibles y únete a la cancha"
+          actionLabel="Explorar Matchups"
           actionHref="/dashboard"
         />
       ) : (

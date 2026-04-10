@@ -26,7 +26,7 @@ export default function ProfilePage() {
       const reta = entry.retas as Record<string, unknown> | null;
       const sport = reta?.sports as Record<string, unknown> | null;
       return {
-        reta: (reta?.title as string) ?? 'Reta',
+        reta: (reta?.title as string) ?? 'Matchup',
         sport: (sport?.name as string) ?? 'Deporte',
         date: (reta?.date as string) ?? '',
         result:
@@ -113,7 +113,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
             <div className="bg-surface-container-low p-8 flex flex-col justify-between">
               <span className="font-sans font-bold text-on-surface-variant uppercase text-xs">
-                Retas Jugadas
+                Matchups Jugados
               </span>
               <span className="font-headline font-black text-6xl text-white">{stats.played}</span>
             </div>
@@ -169,7 +169,9 @@ export default function ProfilePage() {
           Mi Historial
         </h2>
         {history.length === 0 ? (
-          <p className="text-on-surface-variant font-bold py-8">Aún no tienes historial de retas</p>
+          <p className="text-on-surface-variant font-bold py-8">
+            Aún no tienes historial de matchups
+          </p>
         ) : (
           <div className="space-y-1">
             {history.map((item, idx) => (
