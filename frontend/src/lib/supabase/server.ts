@@ -6,8 +6,8 @@ export async function createServerClient(): Promise<ReturnType<typeof createClie
   const cookieStore = await cookies();
 
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
     {
       cookies: {
         getAll(): { name: string; value: string }[] {
