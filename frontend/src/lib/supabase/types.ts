@@ -40,6 +40,7 @@ export interface Database {
           longitude?: number | null;
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       sports: {
         Row: {
@@ -70,6 +71,7 @@ export interface Database {
           team_based?: boolean;
           description?: string | null;
         };
+        Relationships: [];
       };
       retas: {
         Row: {
@@ -129,6 +131,22 @@ export interface Database {
           is_private?: boolean;
           updated_at?: string | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: 'retas_sport_id_fkey';
+            columns: ['sport_id'];
+            isOneToOne: false;
+            referencedRelation: 'sports';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'retas_organizer_id_fkey';
+            columns: ['organizer_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       reta_players: {
         Row: {
@@ -154,6 +172,22 @@ export interface Database {
           team?: string | null;
           status?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: 'reta_players_reta_id_fkey';
+            columns: ['reta_id'];
+            isOneToOne: false;
+            referencedRelation: 'retas';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reta_players_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       notifications: {
         Row: {
@@ -179,6 +213,22 @@ export interface Database {
         Update: {
           is_read?: boolean;
         };
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'notifications_reta_id_fkey';
+            columns: ['reta_id'];
+            isOneToOne: false;
+            referencedRelation: 'retas';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
