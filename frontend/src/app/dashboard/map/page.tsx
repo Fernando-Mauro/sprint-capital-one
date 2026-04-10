@@ -4,10 +4,23 @@ import SportFilters from '@/components/matches/SportFilters';
 import { MAP_STYLE_URL, getUserLocation } from '@/lib/aws-location';
 import { cn } from '@/lib/utils';
 import { getMatches, getSports } from '@/services/matches';
+import {
+  IconBallBasketball,
+  IconBallBaseball,
+  IconBallFootball,
+  IconBallTennis,
+  IconBallVolleyball,
+  IconBike,
+  IconFlag,
+  IconGolf,
+  IconRun,
+  IconSwimming,
+} from '@tabler/icons-react';
 import { Calendar, MapPin, Users, X } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -38,43 +51,44 @@ function getSportColor(name: string | undefined): string {
   return SPORT_COLORS[name.toLowerCase()] ?? '#a4ffb9';
 }
 
-// Unicode sport emoji per sport — actually represents each sport visually
-const SPORT_EMOJIS: Record<string, string> = {
-  futbol: '⚽',
-  fútbol: '⚽',
-  soccer: '⚽',
-  'fútbol 7': '⚽',
-  'futbol 7': '⚽',
-  basquetbol: '🏀',
-  basketball: '🏀',
-  basket: '🏀',
-  voleibol: '🏐',
-  volleyball: '🏐',
-  voley: '🏐',
-  tenis: '🎾',
-  tennis: '🎾',
-  padel: '🎾',
-  pádel: '🎾',
-  beisbol: '⚾',
-  béisbol: '⚾',
-  baseball: '⚾',
-  running: '🏃',
-  correr: '🏃',
-  boxeo: '🥊',
-  boxing: '🥊',
-  golf: '⛳',
-  hockey: '🏒',
-  rugby: '🏉',
-  natacion: '🏊',
-  natación: '🏊',
-  swimming: '🏊',
-  ciclismo: '🚴',
-  cycling: '🚴',
+// Tabler Icons per sport — monochrome line style matches brutalist design
+type SportIcon = typeof IconBallFootball;
+
+const SPORT_ICON_COMPONENTS: Record<string, SportIcon> = {
+  futbol: IconBallFootball,
+  fútbol: IconBallFootball,
+  soccer: IconBallFootball,
+  'fútbol 7': IconBallFootball,
+  'futbol 7': IconBallFootball,
+  basquetbol: IconBallBasketball,
+  basketball: IconBallBasketball,
+  basket: IconBallBasketball,
+  voleibol: IconBallVolleyball,
+  volleyball: IconBallVolleyball,
+  voley: IconBallVolleyball,
+  tenis: IconBallTennis,
+  tennis: IconBallTennis,
+  padel: IconBallTennis,
+  pádel: IconBallTennis,
+  beisbol: IconBallBaseball,
+  béisbol: IconBallBaseball,
+  baseball: IconBallBaseball,
+  running: IconRun,
+  correr: IconRun,
+  golf: IconGolf,
+  natacion: IconSwimming,
+  natación: IconSwimming,
+  swimming: IconSwimming,
+  ciclismo: IconBike,
+  cycling: IconBike,
 };
 
-function getSportEmoji(name: string | undefined): string {
-  if (!name) return '🏆';
-  return SPORT_EMOJIS[name.toLowerCase()] ?? '🏆';
+function getSportIconSvg(name: string | undefined): string {
+  const Icon = ((name && SPORT_ICON_COMPONENTS[name.toLowerCase()]) ??
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    IconFlag) as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return renderToStaticMarkup(<Icon size={22} stroke={2.5} /> as any);
 }
 
 export default function MapPage() {
@@ -167,8 +181,8 @@ export default function MapPage() {
       `;
       const inner = document.createElement('span');
       inner.style.cssText =
-        'transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1;';
-      inner.textContent = getSportEmoji(reta.sports?.name);
+        'transform: rotate(-45deg); display: flex; align-items: center; justify-content: center;';
+      inner.innerHTML = getSportIconSvg(reta.sports?.name);
       el.appendChild(inner);
 
       el.addEventListener('click', (e) => {
