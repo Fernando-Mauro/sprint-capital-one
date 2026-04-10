@@ -66,13 +66,15 @@ export function ChatWindow({ retaId, user }: ChatWindowProps) {
           CHAT DE LA RETA
         </h3>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-primary uppercase animate-pulse">En vivo</span>
+          <span className="text-[10px] font-black text-primary uppercase animate-pulse">
+            En vivo
+          </span>
           <span className="w-2 h-2 bg-primary rounded-full" />
         </div>
       </div>
 
       {/* Messages */}
-      <div 
+      <div
         ref={scrollRef}
         className="flex-1 p-4 overflow-y-auto space-y-4 bg-surface-container-lowest"
       >
@@ -83,16 +85,15 @@ export function ChatWindow({ retaId, user }: ChatWindowProps) {
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full opacity-30 select-none">
             <p className="text-sm font-black uppercase">¡Silencio en la cancha!</p>
-            <p className="text-[10px] uppercase font-bold text-center">Sé el primero en decir algo</p>
+            <p className="text-[10px] uppercase font-bold text-center">
+              Sé el primero en decir algo
+            </p>
           </div>
         ) : (
           messages.map((msg) => {
             const isMe = msg.user_id === user?.id;
             return (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
-              >
+              <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                 <div className="flex items-center gap-2 mb-1">
                   {!isMe && (
                     <span className="text-[10px] font-black text-primary uppercase">
@@ -100,7 +101,10 @@ export function ChatWindow({ retaId, user }: ChatWindowProps) {
                     </span>
                   )}
                   <span className="text-[8px] font-bold text-on-surface-variant/50">
-                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(msg.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </div>
                 <div
@@ -119,7 +123,7 @@ export function ChatWindow({ retaId, user }: ChatWindowProps) {
       </div>
 
       {/* Input */}
-      <form 
+      <form
         onSubmit={handleSendMessage}
         className="p-3 bg-surface-container-high flex gap-2 border-t border-outline-variant"
       >
@@ -130,7 +134,7 @@ export function ChatWindow({ retaId, user }: ChatWindowProps) {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
-        <button 
+        <button
           type="submit"
           className="bg-primary text-on-primary px-4 hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-neo-sm active:scale-95 disabled:opacity-50"
           disabled={!newMessage.trim()}

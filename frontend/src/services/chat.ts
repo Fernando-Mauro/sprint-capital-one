@@ -13,16 +13,17 @@ export async function getChatMessages(retaId: string): Promise<ServiceResult<Ret
 
     if (error) throw error;
     return { data, error: null };
-  } catch (error: any) {
-    console.error('Error fetching chat messages:', error);
-    return { data: null, error: error.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error fetching chat messages';
+    console.error('Error fetching chat messages:', err);
+    return { data: null, error: message };
   }
 }
 
 export async function sendChatMessage(
   retaId: string,
   userId: string,
-  message: string
+  message: string,
 ): Promise<ServiceResult<RetaChatMessage>> {
   try {
     const { data, error } = await supabase
@@ -39,9 +40,10 @@ export async function sendChatMessage(
 
     if (error) throw error;
     return { data, error: null };
-  } catch (error: any) {
-    console.error('Error sending message:', error);
-    return { data: null, error: error.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Error sending message';
+    console.error('Error sending message:', err);
+    return { data: null, error: message };
   }
 }
 
@@ -56,16 +58,16 @@ export function subscribeToChat(retaId: string, onMessage: (message: RetaChatMes
         table: 'reta_chat',
         filter: `reta_id=eq.${retaId}`,
       },
-      async (payload: any) => {
+      async (payload: { new: Record<string, unknown> }) => {
         // Fetch user data for the new message as Realtime payload only includes the row
         const { data } = await supabase
           .from('reta_chat')
           .select('*, users(username, avatar_url)')
           .eq('id', payload.new.id)
           .single();
-        
+
         if (data) onMessage(data);
-      }
+      },
     )
     .subscribe();
 }
