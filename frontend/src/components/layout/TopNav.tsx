@@ -1,7 +1,8 @@
 'use client';
 
+import NotificationsDropdown from '@/components/layout/NotificationsDropdown';
 import { useAuth } from '@/hooks/use-auth';
-import { Bell, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -22,10 +23,7 @@ export default function TopNav() {
         <button className="text-white hover:bg-surface-container transition-colors p-2">
           <Search className="w-6 h-6" />
         </button>
-        <button className="text-white hover:bg-surface-container transition-colors p-2 relative">
-          <Bell className="w-6 h-6" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-primary-container rounded-full" />
-        </button>
+        <NotificationsDropdown />
         <Link
           href="/dashboard/profile"
           className="w-8 h-8 bg-surface-container-highest overflow-hidden border border-outline-variant flex items-center justify-center"
