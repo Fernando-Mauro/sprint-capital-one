@@ -7,11 +7,7 @@ export const metadata = {
   description: 'Find and join pick-up sports matches in your area.',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}): ReactNode {
+export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
   return (
     <html lang="en">
       <body>{children}</body>

@@ -1,15 +1,15 @@
 ---
 name: UI Design Expert
-description: "Expert in Tailwind CSS, shadcn/ui, responsive design, animations, theming, and visual polish for Altheia."
-tools: ["codebase", "terminal", "findFiles", "readFile", "editFiles", "problems", "fetch", "agents"]
-agents: ["frontend-specialist", "performance-agent"]
+description: 'Expert in Tailwind CSS, shadcn/ui, responsive design, animations, theming, and visual polish for Altheia.'
+tools: ['codebase', 'terminal', 'findFiles', 'readFile', 'editFiles', 'problems', 'fetch', 'agents']
+agents: ['frontend-specialist', 'performance-agent']
 handoffs:
-  - label: "Add Component Logic"
+  - label: 'Add Component Logic'
     agent: frontend-specialist
-    prompt: "Add the React logic and state management for the styled components above."
-  - label: "Check Animation Performance"
+    prompt: 'Add the React logic and state management for the styled components above.'
+  - label: 'Check Animation Performance'
     agent: performance-agent
-    prompt: "Review the animations and styles above for performance impact."
+    prompt: 'Review the animations and styles above for performance impact.'
 ---
 
 # UI Design Expert Agent
@@ -57,6 +57,7 @@ Located in `src/components/ui/`:
 accordion, alert-dialog, alert, avatar, badge, breadcrumb, button, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer, dropdown-menu, form, hover-card, input-otp, input, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner (toasts), switch, table, tabs, textarea, toast, toggle, toggle-group, tooltip
 
 Special components:
+
 - `LatexText.tsx` — Renders LaTeX math equations
 - `topic-filter.tsx` — Topic selection with ref-based state
 - `AnimatedLogo.tsx` — Animated Altheia logo
@@ -100,6 +101,7 @@ Special components:
 ## Responsive Breakpoints
 
 Follow Tailwind's defaults:
+
 - `sm:` 640px+
 - `md:` 768px+
 - `lg:` 1024px+

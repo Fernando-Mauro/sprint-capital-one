@@ -7,9 +7,7 @@ interface UpdateUserProfileInput {
   location?: string | undefined;
 }
 
-export async function getUserProfile(
-  _id: string,
-): Promise<ServiceResult<UserProfile>> {
+export async function getUserProfile(_id: string): Promise<ServiceResult<UserProfile>> {
   // TODO: Query Supabase for user profile by id, use .maybeSingle()
   return { data: null, error: 'Not implemented' };
 }
@@ -22,9 +20,7 @@ export async function updateUserProfile(
   return { data: null, error: 'Not implemented' };
 }
 
-export async function getUserMatches(
-  _userId: string,
-): Promise<ServiceResult<Match[]>> {
+export async function getUserMatches(_userId: string): Promise<ServiceResult<Match[]>> {
   // TODO: Query matches where user is organizer or participant
   return { data: null, error: 'Not implemented' };
 }

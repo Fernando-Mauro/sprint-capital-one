@@ -7,6 +7,7 @@ MatchUp is a pick-up match organizer app built with Next.js 15 (App Router) + Ty
 ## Critical Knowledge Base
 
 Always read `AGENTS.md` at the project root before making significant changes. It contains:
+
 - Complete database schema and table relationships
 - Critical React patterns (useCallback before useEffect, `user?.id` over `user`)
 - Authentication flow with Supabase SSR
@@ -42,6 +43,7 @@ pnpm validate     # All checks (lint + typecheck + test + build)
 ## Collaboration Between Agents
 
 When working on a task that spans multiple domains, recommend which specialized agent mode should handle each part:
+
 - **Frontend Specialist** — React components, routing, state management
 - **Backend Specialist** — Supabase queries, API routes, service layer
 - **DB Migrations Manager** — Schema changes, RLS policies, migrations

@@ -7,8 +7,4 @@ export type {
   UpdateMatchInput,
 } from './matches';
 
-export type {
-  UserProfile,
-  ServiceResult,
-  NotificationType,
-} from './database';
+export type { UserProfile, ServiceResult, NotificationType } from './database';

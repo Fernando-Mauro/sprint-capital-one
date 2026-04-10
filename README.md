@@ -26,17 +26,20 @@ Pick-up match organizer app — create, discover, and join casual sports matches
 ### Setup
 
 1. Clone the repository:
+
    ```bash
    git clone <repo-url>
    cd sprint-capital-one
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Copy environment variables:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -44,6 +47,7 @@ Pick-up match organizer app — create, discover, and join casual sports matches
 4. Fill in your `.env.local` with Supabase and AWS credentials.
 
 5. Start the development server:
+
    ```bash
    pnpm dev
    ```
@@ -68,16 +72,16 @@ pnpm db:generate-types
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start dev server |
-| `pnpm build` | Production build |
-| `pnpm lint` | ESLint check |
-| `pnpm typecheck` | TypeScript strict check |
-| `pnpm format` | Prettier format |
-| `pnpm test` | Run unit tests |
-| `pnpm test:e2e` | Run E2E tests |
-| `pnpm validate` | Run all checks (CI locally) |
+| Command          | Description                 |
+| ---------------- | --------------------------- |
+| `pnpm dev`       | Start dev server            |
+| `pnpm build`     | Production build            |
+| `pnpm lint`      | ESLint check                |
+| `pnpm typecheck` | TypeScript strict check     |
+| `pnpm format`    | Prettier format             |
+| `pnpm test`      | Run unit tests              |
+| `pnpm test:e2e`  | Run E2E tests               |
+| `pnpm validate`  | Run all checks (CI locally) |
 
 ## Project Structure
 
@@ -85,12 +89,12 @@ See [AGENTS.md](./AGENTS.md) for the full project structure, database schema, co
 
 ## Branch Strategy
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production (deployed to Vercel) |
-| `develop` | Integration branch |
-| `feature/<name>` | New features |
-| `fix/<name>` | Bug fixes |
+| Branch           | Purpose                         |
+| ---------------- | ------------------------------- |
+| `main`           | Production (deployed to Vercel) |
+| `develop`        | Integration branch              |
+| `feature/<name>` | New features                    |
+| `fix/<name>`     | Bug fixes                       |
 
 All PRs require passing CI and at least 1 review.
 
