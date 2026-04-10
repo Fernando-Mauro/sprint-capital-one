@@ -8,7 +8,7 @@
     "start": "next start frontend",
     "lint": "next lint frontend --max-warnings 0",
     "lint:fix": "next lint frontend --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -p frontend/tsconfig.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",

@@ -235,7 +235,7 @@ export async function GET(request: Request): Promise<Response> {
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Production — deployed to Vercel |
+| `master` | Production — deployed to Vercel |
 | `develop` | Integration branch — PRs merge here first |
 | `feature/<name>` | New features |
 | `fix/<name>` | Bug fixes |
