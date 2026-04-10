@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 
 const tabs = [
   { id: 'explore', label: 'Explorar', icon: Search, href: '/dashboard' },
-  { id: 'canchas', label: 'Canchas', icon: MapIcon, href: '/dashboard/matches' },
+  { id: 'canchas', label: 'Canchas', icon: MapIcon, href: '/dashboard/map' },
   { id: 'create', label: 'Crear', icon: PlusSquare, href: '/dashboard/matches/create' },
   { id: 'matchups', label: 'Matchups', icon: Users, href: '/dashboard/matchups' },
   { id: 'profile', label: 'Perfil', icon: User, href: '/dashboard/profile' },
