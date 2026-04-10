@@ -1,5 +1,6 @@
 // utils/matchmaking.test.js
 const { canJoinReta, kickPlayer } = require('./matchmaking');
+
 describe('Matchmaking Logic - Unirse a Reta', () => {
 
     test('No debe permitir unirse si la reta está llena', () => {

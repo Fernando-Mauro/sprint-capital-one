@@ -39,3 +39,8 @@ function kickPlayer(isOrganizer, targetPlayerStatus) {
         message: "Jugador expulsado correctamente."
     };
 }
+
+module.exports = {
+    canJoinReta,
+    kickPlayer
+};
