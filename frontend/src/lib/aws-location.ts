@@ -12,18 +12,17 @@ export interface PlaceSuggestion {
   longitude: number;
 }
 
-interface GeoRawResult {
+const PLACES_BASE = `https://places.geo.${REGION}.amazonaws.com/v2`;
+
+interface AwsPlaceResultItem {
   PlaceId?: string;
-  Place?: {
-    Label?: string;
-    Geometry?: {
-      Point?: [number, number];
-    };
-  };
+  Title?: string;
+  Address?: { Label?: string };
+  Position?: [number, number];
 }
 
 /**
- * Search for places by text using Amazon Location Places API v2.
+ * Search for places by text using Amazon Location Places API v2 (POST + JSON body).
  * Uses the suggest endpoint for autocomplete.
  */
 export async function searchPlaces(
@@ -32,21 +31,23 @@ export async function searchPlaces(
 ): Promise<PlaceSuggestion[]> {
   if (!query || query.length < 3) return [];
 
-  const params = new URLSearchParams({
-    key: API_KEY,
-    'query-text': query,
-    'max-results': '5',
-    language: 'es',
-  });
+  const body: Record<string, unknown> = {
+    QueryText: query,
+    MaxResults: 5,
+    Language: 'es',
+  };
 
   if (biasPosition) {
-    params.set('bias-position', `${biasPosition[0]},${biasPosition[1]}`);
+    body.BiasPosition = biasPosition;
   }
 
   try {
-    const response = await fetch(
-      `https://places.geo.${REGION}.amazonaws.com/v2/suggest?${params.toString()}`,
-    );
+    const response = await fetch(`${PLACES_BASE}/suggest?key=${encodeURIComponent(API_KEY)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
     if (!response.ok) {
       console.error('Places API error:', response.status, await response.text());
       return [];
@@ -55,25 +56,14 @@ export async function searchPlaces(
     const data = await response.json();
     const items: PlaceSuggestion[] = [];
 
-    for (const item of data.ResultItems ?? []) {
-      const place = item.Place ?? item;
-      const point = place?.Position ?? place?.Geometry?.Point;
-      if (point && Array.isArray(point)) {
-        items.push({
-          placeId: item.PlaceId ?? String(Math.random()),
-          label: place.Address?.Label ?? place.Title ?? item.Title ?? '',
-          longitude: point[0],
-          latitude: point[1],
-        });
-      } else if (item.Title) {
-        // Suggest results may just be text — resolve with geocode on click
-        items.push({
-          placeId: item.PlaceId ?? String(Math.random()),
-          label: item.Title,
-          longitude: 0,
-          latitude: 0,
-        });
-      }
+    for (const item of (data.ResultItems ?? []) as AwsPlaceResultItem[]) {
+      const point = item.Position;
+      items.push({
+        placeId: item.PlaceId ?? String(Math.random()),
+        label: item.Address?.Label ?? item.Title ?? '',
+        longitude: point?.[0] ?? 0,
+        latitude: point?.[1] ?? 0,
+      });
     }
 
     return items;
@@ -85,41 +75,39 @@ export async function searchPlaces(
 
 /**
  * Geocode a text query using the Places API v2 geocode endpoint.
- * Returns the best match with lat/lng.
  */
 export async function geocodeText(
   query: string,
   biasPosition?: [number, number],
 ): Promise<PlaceSuggestion | null> {
-  const params = new URLSearchParams({
-    key: API_KEY,
-    'query-text': query,
-    'max-results': '1',
-    language: 'es',
-  });
+  const body: Record<string, unknown> = {
+    QueryText: query,
+    MaxResults: 1,
+    Language: 'es',
+  };
 
   if (biasPosition) {
-    params.set('bias-position', `${biasPosition[0]},${biasPosition[1]}`);
+    body.BiasPosition = biasPosition;
   }
 
   try {
-    const response = await fetch(
-      `https://places.geo.${REGION}.amazonaws.com/v2/geocode?${params.toString()}`,
-    );
+    const response = await fetch(`${PLACES_BASE}/geocode?key=${encodeURIComponent(API_KEY)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
     if (!response.ok) return null;
 
     const data = await response.json();
-    const item = data.ResultItems?.[0];
-    if (!item) return null;
-
-    const point = item.Position;
-    if (!point) return null;
+    const item = data.ResultItems?.[0] as AwsPlaceResultItem | undefined;
+    if (!item || !item.Position) return null;
 
     return {
       placeId: item.PlaceId ?? '',
       label: item.Address?.Label ?? item.Title ?? query,
-      longitude: point[0],
-      latitude: point[1],
+      longitude: item.Position[0],
+      latitude: item.Position[1],
     };
   } catch (err) {
     console.error('Error geocoding:', err);
@@ -133,7 +121,7 @@ export async function geocodeText(
 export function getUserLocation(): Promise<[number, number]> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      resolve([-99.1332, 19.4326]); // Mexico City
+      resolve([-99.1332, 19.4326]);
       return;
     }
 
@@ -144,8 +132,3 @@ export function getUserLocation(): Promise<[number, number]> {
     );
   });
 }
-
-interface GeoRawResult_ {
-  _: GeoRawResult;
-}
-export type { GeoRawResult_ };
