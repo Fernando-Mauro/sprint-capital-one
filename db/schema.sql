@@ -77,6 +77,26 @@ CREATE TABLE notifications (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- 6. Chat de la Reta
+CREATE TABLE reta_chat (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  reta_id UUID REFERENCES retas(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- ==========================================
+-- ⚠️ HACKATHON MODE: Desactivar Row Level Security (RLS)
+-- Esto permite que tu Frontend de Next.js lea y escriba sin errores 401.
+-- ¡Solo para el Hackathon!
+-- ==========================================
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE sports DISABLE ROW LEVEL SECURITY;
+ALTER TABLE retas DISABLE ROW LEVEL SECURITY;
+ALTER TABLE reta_players DISABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE reta_chat DISABLE ROW LEVEL SECURITY;
 -- =============================================================================
 -- ROW LEVEL SECURITY
 -- =============================================================================

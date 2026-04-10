@@ -3,6 +3,7 @@ export type {
   Sport,
   Reta,
   RetaPlayer,
+  RetaChatMessage,
   ServiceResult,
   NotificationType,
   MatchStatus,
