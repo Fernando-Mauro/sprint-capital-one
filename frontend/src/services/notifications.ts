@@ -1,37 +1,58 @@
+import { createBrowserClient } from '@/lib/supabase/client';
+
 import type { ServiceResult, NotificationType } from '@/types';
+
+const supabase = createBrowserClient();
 
 interface Notification {
   id: string;
   user_id: string;
   type: NotificationType;
   title: string;
-  body: string;
-  data: Record<string, unknown> | null;
-  read: boolean;
+  body: string | null;
+  reta_id: string | null;
+  is_read: boolean;
   created_at: string;
 }
 
-interface CreateNotificationInput {
+export async function getNotifications(
+  userId: string,
+): Promise<ServiceResult<Notification[]>> {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) return { data: null, error: error.message };
+  return { data: data as Notification[], error: null };
+}
+
+export async function markAsRead(
+  notificationIds: string[],
+): Promise<ServiceResult<null>> {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .in('id', notificationIds);
+
+  if (error) return { data: null, error: error.message };
+  return { data: null, error: null };
+}
+
+export async function createNotification(input: {
   user_id: string;
-  type: NotificationType;
+  type: string;
   title: string;
-  body: string;
-  data?: Record<string, unknown> | undefined;
-}
+  body?: string;
+  reta_id?: string;
+}): Promise<ServiceResult<Notification>> {
+  const { data, error } = await supabase
+    .from('notifications')
+    .insert(input)
+    .select()
+    .single();
 
-export async function getNotifications(_userId: string): Promise<ServiceResult<Notification[]>> {
-  // TODO: Query Supabase for user notifications, ordered by created_at desc
-  return { data: null, error: 'Not implemented' };
-}
-
-export async function markAsRead(_notificationIds: string[]): Promise<ServiceResult<null>> {
-  // TODO: Update notifications to read = true
-  return { data: null, error: 'Not implemented' };
-}
-
-export async function createNotification(
-  _input: CreateNotificationInput,
-): Promise<ServiceResult<Notification>> {
-  // TODO: Insert notification into Supabase
-  return { data: null, error: 'Not implemented' };
+  if (error) return { data: null, error: error.message };
+  return { data: data as Notification, error: null };
 }
