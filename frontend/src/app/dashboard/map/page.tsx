@@ -147,7 +147,7 @@ export default function MapPage() {
   }, [retas, mapReady]);
 
   return (
-    <div className="relative h-[calc(100vh-9rem)] -mx-4 -mt-4">
+    <div className="fixed inset-x-0 top-16 bottom-20 overflow-hidden">
       {/* Map */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
