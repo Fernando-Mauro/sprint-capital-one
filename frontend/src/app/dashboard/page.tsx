@@ -7,7 +7,7 @@ import SportFilters from '@/components/matches/SportFilters';
 import { getMatches, getSports } from '@/services/matches';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Reta, Sport } from '@/types';
 
@@ -15,22 +15,36 @@ export default function DashboardPage() {
   const [retas, setRetas] = useState<Reta[]>([]);
   const [sports, setSports] = useState<Sport[]>([]);
   const [activeSport, setActiveSport] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingRetas, setLoadingRetas] = useState(true);
+  const [loadingSports, setLoadingSports] = useState(true);
+  const sportsLoaded = useRef(false);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    const [retasResult, sportsResult] = await Promise.all([
-      getMatches(activeSport ? { sport_id: activeSport, status: 'open' } : { status: 'open' }),
-      getSports(),
-    ]);
-    if (retasResult.data) setRetas(retasResult.data);
-    if (sportsResult.data) setSports(sportsResult.data as Sport[]);
-    setLoading(false);
+  // Load sports only once
+  useEffect(() => {
+    if (sportsLoaded.current) return;
+    sportsLoaded.current = true;
+
+    const loadSports = async () => {
+      const result = await getSports();
+      if (result.data) setSports(result.data as Sport[]);
+      setLoadingSports(false);
+    };
+    loadSports();
+  }, []);
+
+  // Load retas when sport filter changes
+  const loadRetas = useCallback(async () => {
+    setLoadingRetas(true);
+    const result = await getMatches(
+      activeSport ? { sport_id: activeSport, status: 'open' } : { status: 'open' },
+    );
+    if (result.data) setRetas(result.data);
+    setLoadingRetas(false);
   }, [activeSport]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadRetas();
+  }, [loadRetas]);
 
   return (
     <div className="px-4 max-w-5xl mx-auto space-y-8 pt-4">
@@ -54,13 +68,23 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <SportFilters sports={sports} activeSport={activeSport} onSelect={setActiveSport} />
+      {/* Filters — always visible, show skeleton chips while loading */}
+      {loadingSports ? (
+        <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-10 w-24 bg-surface-container-high animate-pulse shrink-0" />
+          ))}
+        </div>
+      ) : (
+        <SportFilters sports={sports} activeSport={activeSport} onSelect={setActiveSport} />
+      )}
 
-      {loading ? (
+      {/* Retas — skeleton while loading, empty state if no results */}
+      {loadingRetas ? (
         <LoadingSkeleton />
       ) : retas.length === 0 ? (
         <EmptyState
-          title="No hay retas disponibles"
+          title={activeSport ? 'No hay retas de este deporte' : 'No hay retas disponibles'}
           description="Sé el primero en crear una"
           actionLabel="Crear Reta"
           actionHref="/dashboard/matches/create"
@@ -73,9 +97,10 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* FAB */}
       <Link
         href="/dashboard/matches/create"
-        className="fixed bottom-24 right-6 w-16 h-16 bg-primary-container text-on-primary-fixed flex items-center justify-center shadow-[0_10px_40px_rgba(0,253,134,0.4)] hover:scale-110 active:scale-95 transition-all z-50"
+        className="fixed bottom-24 right-6 w-16 h-16 bg-primary-container text-on-primary-fixed flex items-center justify-center shadow-[0_10px_40px_rgba(0,253,134,0.4)] hover:scale-110 active:scale-95 transition-all z-50 cursor-pointer"
       >
         <Plus className="w-10 h-10 font-bold" />
       </Link>
