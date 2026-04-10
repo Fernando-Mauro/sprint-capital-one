@@ -1,9 +1,9 @@
 export type { Reta as Match } from './database';
 export type { RetaPlayer as MatchParticipant } from './database';
 export type { Sport } from './database';
+export type { MatchStatus, ParticipantStatus } from './database';
 
-export type MatchStatus = 'open' | 'full' | 'in_progress' | 'completed' | 'cancelled';
-export type ParticipantStatus = 'confirmed' | 'pending' | 'declined' | 'no_show' | 'kicked';
+import type { MatchStatus } from './database';
 
 export interface CreateMatchInput {
   title: string;

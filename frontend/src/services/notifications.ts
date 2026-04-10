@@ -38,7 +38,7 @@ export async function markAsRead(notificationIds: string[]): Promise<ServiceResu
 
 export async function createNotification(input: {
   user_id: string;
-  type: string;
+  type: NotificationType;
   title: string;
   body?: string;
   reta_id?: string;

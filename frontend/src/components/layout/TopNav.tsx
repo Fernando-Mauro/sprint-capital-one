@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { Bell, Search } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function TopNav() {
@@ -30,7 +31,7 @@ export default function TopNav() {
           className="w-8 h-8 bg-surface-container-highest overflow-hidden border border-outline-variant flex items-center justify-center"
         >
           {user?.avatar_url ? (
-            <img alt="Profile" className="w-full h-full object-cover" src={user.avatar_url} />
+            <Image alt="Profile" className="w-full h-full object-cover" src={user.avatar_url} width={32} height={32} />
           ) : (
             <span className="text-xs font-black text-primary">
               {user?.username?.charAt(0).toUpperCase() ?? '?'}

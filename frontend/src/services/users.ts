@@ -46,14 +46,14 @@ export async function getUserStats(userId: string): Promise<{
   return { played, organized, noShows };
 }
 
-export async function getUserRetaHistory(userId: string) {
+export async function getUserRetaHistory(userId: string): Promise<Record<string, unknown>[]> {
   const { data, error } = await supabase
     .from('reta_players')
-    .select('*, retas(*, sports(*))')
+    .select('status, joined_at, retas(id, title, date, start_time, status, sports(id, name))')
     .eq('user_id', userId)
     .order('joined_at', { ascending: false })
     .limit(10);
 
   if (error) return [];
-  return data ?? [];
+  return (data as Record<string, unknown>[]) ?? [];
 }

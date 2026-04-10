@@ -26,10 +26,11 @@ interface AuthState {
   updatePassword: (password: string) => Promise<{ error: string | null }>;
 }
 
+const supabase = createBrowserClient();
+
 export function useAuth(): AuthState {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createBrowserClient();
 
   const fetchProfile = useCallback(
     async (userId: string) => {
@@ -51,8 +52,12 @@ export function useAuth(): AuthState {
           authUser.user_metadata?.name ??
           email.split('@')[0] ??
           '';
+        const sanitizedName = (fullName as string)
+          .toLowerCase()
+          .replace(/[^a-z0-9_]/g, '')
+          .slice(0, 30);
         const username =
-          (fullName as string).toLowerCase().replace(/\s+/g, '_') + '_' + userId.slice(0, 4);
+          (sanitizedName || 'user') + '_' + userId.slice(0, 4);
 
         const { data: newProfile } = await supabase
           .from('users')
@@ -71,7 +76,7 @@ export function useAuth(): AuthState {
         }
       }
     },
-    [supabase],
+    [],
   );
 
   useEffect(() => {
@@ -98,7 +103,7 @@ export function useAuth(): AuthState {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase, fetchProfile]);
+  }, [fetchProfile]);
 
   const signIn = async (email: string, password: string, captchaToken?: string) => {
     const { error } = await supabase.auth.signInWithPassword({

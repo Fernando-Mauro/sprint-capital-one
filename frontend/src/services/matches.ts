@@ -1,6 +1,6 @@
 import { createBrowserClient } from '@/lib/supabase/client';
 
-import type { Reta, RetaPlayer, ServiceResult } from '@/types';
+import type { Reta, RetaPlayer, ServiceResult, Sport } from '@/types';
 import type { CreateMatchInput, UpdateMatchInput } from '@/types/matches';
 
 const supabase = createBrowserClient();
@@ -11,7 +11,7 @@ interface MatchFilters {
 }
 
 export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<Reta[]>> {
-  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true });
+  let query = supabase.from('retas').select('*, sports(*)').order('date', { ascending: true }).limit(50);
 
   if (filters?.sport_id) {
     query = query.eq('sport_id', filters.sport_id);
@@ -22,6 +22,7 @@ export async function getMatches(filters?: MatchFilters): Promise<ServiceResult<
 
   const { data, error } = await query;
   if (error) return { data: null, error: error.message };
+  // Supabase returns joined data that doesn't match the generated types
   return { data: data as unknown as Reta[], error: null };
 }
 
@@ -36,6 +37,7 @@ export async function getMatchById(
 
   if (error) return { data: null, error: error.message };
   if (!data) return { data: null, error: 'Reta no encontrada' };
+  // Supabase returns joined data that doesn't match the generated types
   return { data: data as unknown as Reta & { reta_players: RetaPlayer[] }, error: null };
 }
 
@@ -108,10 +110,11 @@ export async function joinMatch(
 
   if (error) return { data: null, error: error.message };
 
+  // TODO: SECURITY - Replace with Supabase RPC for atomic increment to prevent race conditions
   // Increment current_players
   const { data: reta } = await supabase
     .from('retas')
-    .select('current_players')
+    .select('organizer_id, title, current_players')
     .eq('id', retaId)
     .single();
 
@@ -120,6 +123,31 @@ export async function joinMatch(
       .from('retas')
       .update({ current_players: reta.current_players + 1 })
       .eq('id', retaId);
+
+    // Notify the organizer (fire-and-forget)
+    const { data: joiningUser } = await supabase
+      .from('users')
+      .select('username')
+      .eq('id', userId)
+      .maybeSingle();
+
+    const username = joiningUser?.username ?? 'Un jugador';
+    const retaTitle = reta.title as string;
+
+    supabase
+      .from('notifications')
+      .insert({
+        user_id: reta.organizer_id as string,
+        type: 'player_joined',
+        title: 'Nuevo jugador en tu reta',
+        body: `${username} se unió a "${retaTitle}"`,
+        reta_id: retaId,
+      })
+      .then(({ error: notifError }) => {
+        if (notifError) {
+          console.error('Failed to insert join notification:', notifError.message);
+        }
+      });
   }
 
   return { data: data as RetaPlayer, error: null };
@@ -134,6 +162,7 @@ export async function leaveMatch(retaId: string, userId: string): Promise<Servic
 
   if (error) return { data: null, error: error.message };
 
+  // TODO: SECURITY - Replace with Supabase RPC for atomic decrement to prevent race conditions
   // Decrement current_players
   const { data: reta } = await supabase
     .from('retas')
@@ -155,9 +184,9 @@ export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
   return updateMatch(id, { status: 'cancelled' });
 }
 
-export async function getSports(): Promise<ServiceResult<{ id: string; name: string }[]>> {
-  const { data, error } = await supabase.from('sports').select('id, name').order('name');
+export async function getSports(): Promise<ServiceResult<Sport[]>> {
+  const { data, error } = await supabase.from('sports').select('*').order('name');
 
   if (error) return { data: null, error: error.message };
-  return { data, error: null };
+  return { data: data as Sport[], error: null };
 }
