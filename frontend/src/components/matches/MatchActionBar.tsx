@@ -44,7 +44,7 @@ export default function MatchActionBar({
           <button
             onClick={onJoin}
             disabled={loading || currentPlayers >= maxPlayers}
-            className="flex-1 md:w-48 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase italic py-4 text-xl tracking-tighter active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 md:w-48 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase italic py-4 text-xl tracking-tighter active:scale-95 transition-transform disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'CARGANDO...' : 'UNIRME'}
           </button>
@@ -52,7 +52,7 @@ export default function MatchActionBar({
           <button
             onClick={onLeave}
             disabled={loading || isOrganizer}
-            className="flex-1 md:w-48 border-2 border-outline text-outline font-headline font-black uppercase italic py-4 text-xl tracking-tighter hover:border-error hover:text-error transition-colors active:scale-95 disabled:opacity-50"
+            className="flex-1 md:w-48 border-2 border-outline text-outline font-headline font-black uppercase italic py-4 text-xl tracking-tighter hover:border-error hover:text-error transition-colors active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'CARGANDO...' : 'SALIRME'}
           </button>
