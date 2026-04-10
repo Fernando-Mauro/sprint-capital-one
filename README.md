@@ -8,7 +8,7 @@ Live demo: [matchup deployment on Vercel]
 
 > **⚠️ Note about commits and PRs**
 >
-> Due to Vercel's deployment policies, once we set up the deployment, **only one team member was able to create pull requests** to prevent Vercel from failing with permission errors when trying to deploy from accounts without access to the project. This means that even though the commits and PRs appear to be authored by a single person on GitHub, **the entire team contributed equally** to the code. Every feature, fix, and refactor was worked on collaboratively — the name on the commit only reflects who had to open the PR, not who wrote the code.
+> Due to Vercel's deployment policies, once we set up the deployment, **only one team member was able to create pull requests** to prevent Vercel from failing with permission errors when trying to deploy from accounts without access to the project. This means that even though the commits and PRs appear to be authored by a single person on GitHub, **the entire team contributed equally** to the code. Every feature, fix, and refactor was worked on collaboratively — the name on the commits show who wrote the code.
 
 ---
 
