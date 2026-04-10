@@ -4,12 +4,8 @@ import LocationPicker from '@/components/map/LocationPicker';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { createMatch, getSports } from '@/services/matches';
-<<<<<<< feature/maps-aws-location
-import { ArrowLeft, Calendar, Globe, Lock } from 'lucide-react';
-=======
 import InteractiveTimePicker from '@/components/ui/InteractiveTimePicker';
-import { ArrowLeft, Calendar, Globe, Lock, MapPin } from 'lucide-react';
->>>>>>> master
+import { ArrowLeft, Calendar, Globe, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
