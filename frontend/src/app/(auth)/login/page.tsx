@@ -1,27 +1,55 @@
 'use client';
 
 import AuthBackground from '@/components/auth/AuthBackground';
-import ErrorAlert from '@/components/ui/ErrorAlert';
+import CaptchaWidget from '@/components/auth/CaptchaWidget';
+import FormField from '@/components/ui/FormField';
+import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/use-auth';
+import { loginSchema } from '@/lib/validations/auth';
 import { Globe, Lock, Mail, Bolt } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import type { LoginInput } from '@/lib/validations/auth';
+
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<LoginInput>({ email: '', password: '' });
+  const [errors, setErrors] = useState<Partial<Record<keyof LoginInput, string>>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { signIn, signInWithGoogle } = useAuth();
   const router = useRouter();
 
+  const updateField = (field: keyof LoginInput, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+
+    const result = loginSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof LoginInput, string>> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof LoginInput;
+        if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
     setLoading(true);
-    setError(null);
-    const result = await signIn(email, password);
-    if (result.error) {
-      setError(result.error);
+    const signInResult = await signIn(form.email, form.password, captchaToken ?? undefined);
+    if (signInResult.error) {
+      setServerError(
+        signInResult.error.includes('Invalid login')
+          ? 'Correo o contraseña incorrectos'
+          : signInResult.error,
+      );
       setLoading(false);
     } else {
       router.push('/dashboard');
@@ -45,56 +73,70 @@ export default function LoginPage() {
             <span className="font-headline text-lg font-black uppercase tracking-widest text-primary border-b-4 border-primary pb-1">
               Ingresar
             </span>
-            <button
-              onClick={() => router.push('/register')}
-              className="font-headline text-lg font-black uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
+            <Link
+              href="/register"
+              className="font-headline text-lg font-black uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
             >
               Registro
-            </button>
+            </Link>
           </div>
 
-          {error && <ErrorAlert message={error} />}
+          {serverError && (
+            <div className="bg-error/10 border border-error text-error text-sm font-bold p-3">
+              {serverError}
+            </div>
+          )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <label className="font-headline text-xs font-black uppercase tracking-widest text-on-surface-variant">
-                Correo Electrónico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" />
-                <input
-                  className="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-primary-container focus:ring-0 text-on-surface font-bold p-4 pl-12 placeholder:text-outline transition-all focus:outline-none"
-                  placeholder="ATLETA@MATCHUP.COM"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+            <FormField
+              label="Correo Electrónico"
+              icon={Mail}
+              type="email"
+              placeholder="ATLETA@MATCHUP.COM"
+              value={form.email}
+              onChange={(v) => updateField('email', v)}
+              error={errors.email}
+            />
+            <FormField
+              label="Contraseña"
+              icon={Lock}
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(v) => updateField('password', v)}
+              error={errors.password}
+            />
+
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-xs font-bold text-primary uppercase tracking-widest hover:text-primary-container transition-colors cursor-pointer"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
-            <div className="space-y-2">
-              <label className="font-headline text-xs font-black uppercase tracking-widest text-on-surface-variant">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" />
-                <input
-                  className="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-primary-container focus:ring-0 text-on-surface font-bold p-4 pl-12 transition-all focus:outline-none"
-                  placeholder="••••••••"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+
+            <CaptchaWidget onSuccess={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase text-xl py-4 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase text-xl py-4 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
             >
-              {loading ? 'Cargando...' : 'Entrar al Juego'}
-              {!loading && <Bolt className="w-6 h-6 fill-current" />}
+              {loading ? (
+                <>
+                  <Spinner
+                    size="sm"
+                    className="border-on-primary-fixed/30 border-t-on-primary-fixed"
+                  />
+                  Ingresando...
+                </>
+              ) : (
+                <>
+                  Entrar al Juego
+                  <Bolt className="w-6 h-6 fill-current" />
+                </>
+              )}
             </button>
           </form>
 
@@ -108,7 +150,7 @@ export default function LoginPage() {
 
           <button
             onClick={signInWithGoogle}
-            className="w-full bg-surface-container-highest border border-outline-variant hover:border-primary text-on-surface font-headline font-black uppercase text-sm py-4 flex items-center justify-center gap-3 transition-all"
+            className="w-full bg-surface-container-highest border border-outline-variant hover:border-primary text-on-surface font-headline font-black uppercase text-sm py-4 flex items-center justify-center gap-3 transition-all cursor-pointer"
           >
             <Globe className="w-5 h-5" />
             Google Auth
