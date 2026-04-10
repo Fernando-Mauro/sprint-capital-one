@@ -39,7 +39,10 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   const isAuthRoute =
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register') ||
-    request.nextUrl.pathname.startsWith('/auth');
+    request.nextUrl.pathname.startsWith('/auth') ||
+    request.nextUrl.pathname.startsWith('/forgot-password') ||
+    request.nextUrl.pathname.startsWith('/check-email') ||
+    request.nextUrl.pathname.startsWith('/update-password');
   const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute;
 
   if (!user && !isPublicRoute) {

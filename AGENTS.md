@@ -306,6 +306,8 @@ const { data } = await supabase.from('matches').select('*').eq('id', id).maybeSi
 - `joinMatch(matchId, userId)` — Join / waitlist for a match
 - `leaveMatch(matchId, userId)` — Leave a match
 
+> **Note:** `getMatches()` is limited to 50 results. Add pagination for production use.
+
 ### `services/users.ts`
 
 - `getUserProfile(id)` — Fetch user profile
@@ -531,6 +533,45 @@ Does this component need:
   └─ None of the above?                 → Server Component (default)
 ```
 
+### Supabase Client — Module-Level Instantiation (Performance)
+
+```tsx
+// ❌ WRONG — creates new client on every render, causes re-render loops
+export function useAuth() {
+  const supabase = createBrowserClient(); // new object each render
+  const fn = useCallback(() => {}, [supabase]); // fn recreated every render
+}
+
+// ✅ CORRECT — module-level client, stable reference
+const supabase = createBrowserClient();
+export function useAuth() {
+  const fn = useCallback(() => {}, []); // stable
+}
+```
+
+### Next.js Image Optimization
+
+```tsx
+// ❌ WRONG — unoptimized external images
+<img src="https://images.unsplash.com/..." alt="Match" />;
+
+// ✅ CORRECT — Next.js Image with remote patterns configured in next.config.ts
+import Image from 'next/image';
+<Image src="https://images.unsplash.com/..." alt="Match" fill sizes="100vw" />;
+```
+
+Remote patterns must be configured in `next.config.ts`:
+
+```ts
+images: {
+  remotePatterns: [
+    { protocol: 'https', hostname: 'images.unsplash.com' },
+    { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+    { protocol: 'https', hostname: '*.amazonaws.com' },
+  ],
+}
+```
+
 ---
 
 ## Security Requirements
@@ -542,6 +583,8 @@ Does this component need:
 - **Rate limiting** on API routes (consider `@upstash/ratelimit`).
 - **CSRF protection** handled by Supabase Auth cookies + Next.js middleware.
 - **Environment variables** — never prefix server-only secrets with `NEXT_PUBLIC_`.
+- **Input validation on API routes** — All API route POST handlers use Zod schemas for body validation. GET params are validated against expected formats (UUID regex, enum values).
+- **RLS enabled on all tables** — `db/schema.sql` has RLS enabled with proper policies. Never disable RLS, even for hackathon/MVP purposes.
 
 ---
 
@@ -561,11 +604,14 @@ Does this component need:
 
 ## Common Bugs & Fixes
 
-| Issue                                | Cause                                     | Fix                                                           |
-| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------- |
-| Infinite re-render                   | Object in useCallback deps                | Use `obj?.id` (primitive) instead                             |
-| "can't access lexical declaration"   | useEffect before useCallback              | Move useCallback above useEffect                              |
-| Supabase `.single()` throws PGRST116 | No row found                              | Use `.maybeSingle()` instead                                  |
-| S3 upload 403                        | Wrong IAM policy or expired presigned URL | Check bucket policy + URL TTL                                 |
-| Middleware redirect loop             | Missing matcher config                    | Add `matcher` array to `middleware.ts` config                 |
-| Hydration mismatch                   | Server/client render different content    | Ensure consistent rendering or use `suppressHydrationWarning` |
+| Issue                                  | Cause                                                                                                               | Fix                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Infinite re-render                     | Object in useCallback deps                                                                                          | Use `obj?.id` (primitive) instead                                |
+| "can't access lexical declaration"     | useEffect before useCallback                                                                                        | Move useCallback above useEffect                                 |
+| Supabase `.single()` throws PGRST116   | No row found                                                                                                        | Use `.maybeSingle()` instead                                     |
+| S3 upload 403                          | Wrong IAM policy or expired presigned URL                                                                           | Check bucket policy + URL TTL                                    |
+| Middleware redirect loop               | Missing matcher config                                                                                              | Add `matcher` array to `middleware.ts` config                    |
+| Hydration mismatch                     | Server/client render different content                                                                              | Ensure consistent rendering or use `suppressHydrationWarning`    |
+| `@supabase/ssr` type mismatch          | `@supabase/ssr@0.5.2` imports from `supabase-js/dist/module/lib/types` which doesn't exist in `supabase-js@2.103.0` | Upgrade `@supabase/ssr` or use `any` with eslint-disable comment |
+| Race condition in joinMatch/leaveMatch | Non-atomic read-then-update of `current_players`                                                                    | Replace with Supabase RPC for atomic increment/decrement         |
+| Unsanitized OAuth username             | OAuth metadata used directly for username generation                                                                | Sanitize with `replace(/[^a-z0-9_]/g, '')` + length limit        |

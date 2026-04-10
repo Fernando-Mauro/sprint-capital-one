@@ -1,3 +1,6 @@
+export type MatchStatus = 'open' | 'full' | 'in_progress' | 'completed' | 'cancelled';
+export type ParticipantStatus = 'confirmed' | 'pending' | 'declined' | 'no_show' | 'kicked';
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -36,7 +39,7 @@ export interface Reta {
   max_players: number;
   current_players: number;
   min_skill_level: string | null;
-  status: string;
+  status: MatchStatus;
   description: string | null;
   is_private: boolean;
   created_at: string;
@@ -49,9 +52,9 @@ export interface RetaPlayer {
   id: string;
   reta_id: string;
   user_id: string;
-  role: string;
+  role: 'organizer' | 'player';
   team: string | null;
-  status: string;
+  status: ParticipantStatus;
   joined_at: string;
   // Joined fields
   users?: UserProfile;

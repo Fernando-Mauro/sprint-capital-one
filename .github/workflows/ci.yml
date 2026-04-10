@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [master, develop]
 
-# Reusable setup steps via a shared install job, then parallel checks
+# CI checks are informational — they do not block merges.
+# Remove 'continue-on-error' once all team members have proper access.
 jobs:
   install:
     name: Install Dependencies

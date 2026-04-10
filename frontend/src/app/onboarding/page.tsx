@@ -101,7 +101,7 @@ export default function OnboardingPage() {
 
         <footer className="text-center">
           <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
-            Performance Driven UI © 2024 MatchUp
+            Created by Muchachos, idk © 2026 MatchUp
           </p>
         </footer>
       </main>
