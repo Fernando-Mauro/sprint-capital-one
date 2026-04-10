@@ -40,7 +40,11 @@ export default function MatchActionBar({
         </p>
       </div>
       <div className="flex gap-4 w-full md:w-auto">
-        {!isParticipant ? (
+        {isOrganizer ? (
+          <div className="flex-1 md:w-48 bg-primary-container/20 border-2 border-primary-container text-primary-container font-headline font-black uppercase italic py-4 text-xl tracking-tighter text-center">
+            ORGANIZADOR
+          </div>
+        ) : !isParticipant ? (
           <button
             onClick={onJoin}
             disabled={loading || currentPlayers >= maxPlayers}
@@ -51,7 +55,7 @@ export default function MatchActionBar({
         ) : (
           <button
             onClick={onLeave}
-            disabled={loading || isOrganizer}
+            disabled={loading}
             className="flex-1 md:w-48 border-2 border-outline text-outline font-headline font-black uppercase italic py-4 text-xl tracking-tighter hover:border-error hover:text-error transition-colors active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'CARGANDO...' : 'SALIRME'}
