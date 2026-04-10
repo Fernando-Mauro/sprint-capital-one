@@ -21,6 +21,6 @@
       "@/*": ["./frontend/src/*"]
     }
   },
-  "include": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"],
+  "include": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx", "utils/**/*.ts"],
   "exclude": ["node_modules", "frontend/.next"]
 }
