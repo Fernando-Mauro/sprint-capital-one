@@ -2,7 +2,6 @@
 
 Pick-up match organizer app — create, discover, and join casual sports matches in your area.
 
-
 ## Tech Stack
 
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
