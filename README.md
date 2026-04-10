@@ -27,61 +27,61 @@ Live demo: [matchup deployment on Vercel]
 
 ### Core
 
-| Layer                  | Technology                                                                               |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| **Framework**          | [Next.js 15](https://nextjs.org/) (App Router, Server Components, Middleware)            |
-| **Language**           | TypeScript (strict mode, `noUncheckedIndexedAccess`)                                     |
-| **Styling**            | [Tailwind CSS 4](https://tailwindcss.com/) (via `@theme`) + custom brutalist tokens      |
-| **Icons**              | [Lucide React](https://lucide.dev/) (UI) + [Tabler Icons](https://tabler.io/icons) (map) |
-| **Animations**         | [Motion (formerly Framer Motion)](https://motion.dev/)                                   |
-| **Form validation**    | [Zod](https://zod.dev/)                                                                  |
+| Layer               | Technology                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| **Framework**       | [Next.js 15](https://nextjs.org/) (App Router, Server Components, Middleware)            |
+| **Language**        | TypeScript (strict mode, `noUncheckedIndexedAccess`)                                     |
+| **Styling**         | [Tailwind CSS 4](https://tailwindcss.com/) (via `@theme`) + custom brutalist tokens      |
+| **Icons**           | [Lucide React](https://lucide.dev/) (UI) + [Tabler Icons](https://tabler.io/icons) (map) |
+| **Animations**      | [Motion (formerly Framer Motion)](https://motion.dev/)                                   |
+| **Form validation** | [Zod](https://zod.dev/)                                                                  |
 
 ### Backend & Data
 
-| Feature           | Technology                                                                                    |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| **Database**      | [Supabase](https://supabase.com/) (PostgreSQL)                                                 |
-| **Auth**          | Supabase Auth (email/password, Google OAuth, email confirmation, password reset)               |
-| **Realtime chat** | Supabase Realtime (`postgres_changes` channel on `reta_chat` table)                            |
-| **Notifications** | Postgres trigger → `notifications` table                                                       |
-| **SSR auth**      | `@supabase/ssr` with cookie-based session (middleware uses `getSession()` for fast SSR)        |
-| **File Storage**  | AWS S3 (profile pictures — scaffolded)                                                         |
+| Feature           | Technology                                                                              |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| **Database**      | [Supabase](https://supabase.com/) (PostgreSQL)                                          |
+| **Auth**          | Supabase Auth (email/password, Google OAuth, email confirmation, password reset)        |
+| **Realtime chat** | Supabase Realtime (`postgres_changes` channel on `reta_chat` table)                     |
+| **Notifications** | Postgres trigger → `notifications` table                                                |
+| **SSR auth**      | `@supabase/ssr` with cookie-based session (middleware uses `getSession()` for fast SSR) |
+| **File Storage**  | AWS S3 (profile pictures — scaffolded)                                                  |
 
 ### Maps & Location
 
-| Feature            | Technology                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------- |
-| **Map rendering**  | [MapLibre GL JS](https://maplibre.org/) with [Amazon Location Service](https://aws.amazon.com/location/) Standard style (Dark color scheme) |
-| **Place search**   | Amazon Location **Places API v2** (`/suggest` + `/geocode` endpoints) — no SDK required, direct HTTPS calls with API Key |
-| **User location**  | Browser `navigator.geolocation` with Mexico City fallback                                     |
-| **Pin markers**    | Custom DOM markers with diamond shape, color-coded + Tabler sport icons per sport             |
+| Feature           | Technology                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Map rendering** | [MapLibre GL JS](https://maplibre.org/) with [Amazon Location Service](https://aws.amazon.com/location/) Standard style (Dark color scheme) |
+| **Place search**  | Amazon Location **Places API v2** (`/suggest` + `/geocode` endpoints) — no SDK required, direct HTTPS calls with API Key                    |
+| **User location** | Browser `navigator.geolocation` with Mexico City fallback                                                                                   |
+| **Pin markers**   | Custom DOM markers with diamond shape, color-coded + Tabler sport icons per sport                                                           |
 
 ### Security
 
-| Feature             | Technology                                                                        |
-| ------------------- | --------------------------------------------------------------------------------- |
-| **Bot protection**  | [hCaptcha](https://www.hcaptcha.com/) on all auth forms (integrated via Supabase) |
-| **Input validation** | Zod schemas on both client and API routes                                        |
-| **Middleware auth** | Route protection for `/dashboard/**` via Next.js middleware                       |
-| **CSRF**            | Supabase cookies are `httpOnly` + `sameSite`                                      |
+| Feature              | Technology                                                                        |
+| -------------------- | --------------------------------------------------------------------------------- |
+| **Bot protection**   | [hCaptcha](https://www.hcaptcha.com/) on all auth forms (integrated via Supabase) |
+| **Input validation** | Zod schemas on both client and API routes                                         |
+| **Middleware auth**  | Route protection for `/dashboard/**` via Next.js middleware                       |
+| **CSRF**             | Supabase cookies are `httpOnly` + `sameSite`                                      |
 
 ### Testing & Tooling
 
-| Tool             | Purpose                        |
-| ---------------- | ------------------------------ |
-| **Jest**         | Unit tests                     |
-| **Testing Library** | Component tests             |
-| **Playwright**   | E2E tests                      |
-| **ESLint**       | Lint with `--max-warnings 0`   |
-| **Prettier**     | Code formatting                |
-| **TypeScript**   | Strict type checking           |
-| **pnpm**         | Package manager                |
+| Tool                | Purpose                      |
+| ------------------- | ---------------------------- |
+| **Jest**            | Unit tests                   |
+| **Testing Library** | Component tests              |
+| **Playwright**      | E2E tests                    |
+| **ESLint**          | Lint with `--max-warnings 0` |
+| **Prettier**        | Code formatting              |
+| **TypeScript**      | Strict type checking         |
+| **pnpm**            | Package manager              |
 
 ### Deployment & CI/CD
 
-| Service        | Usage                                    |
-| -------------- | ---------------------------------------- |
-| **Vercel**     | Production deployment (root: `frontend/`) |
+| Service            | Usage                                                 |
+| ------------------ | ----------------------------------------------------- |
+| **Vercel**         | Production deployment (root: `frontend/`)             |
 | **GitHub Actions** | CI: lint, typecheck, format, tests, build on every PR |
 
 ---
@@ -197,18 +197,18 @@ frontend/
 
 ## Scripts
 
-| Command             | Description                          |
-| ------------------- | ------------------------------------ |
-| `pnpm dev`          | Start Next.js dev server             |
-| `pnpm build`        | Production build                     |
-| `pnpm start`        | Run production build                 |
-| `pnpm lint`         | ESLint with zero warnings            |
-| `pnpm typecheck`    | Strict TypeScript check              |
-| `pnpm format`       | Prettier format                      |
-| `pnpm format:check` | Prettier verification (used in CI)   |
-| `pnpm test`         | Run Jest unit tests                  |
-| `pnpm test:e2e`     | Run Playwright E2E tests             |
-| `pnpm validate`     | Run lint + typecheck + test + build  |
+| Command             | Description                         |
+| ------------------- | ----------------------------------- |
+| `pnpm dev`          | Start Next.js dev server            |
+| `pnpm build`        | Production build                    |
+| `pnpm start`        | Run production build                |
+| `pnpm lint`         | ESLint with zero warnings           |
+| `pnpm typecheck`    | Strict TypeScript check             |
+| `pnpm format`       | Prettier format                     |
+| `pnpm format:check` | Prettier verification (used in CI)  |
+| `pnpm test`         | Run Jest unit tests                 |
+| `pnpm test:e2e`     | Run Playwright E2E tests            |
+| `pnpm validate`     | Run lint + typecheck + test + build |
 
 ---
 
