@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 export const metadata = {
   title: 'MatchUp',
-  description: 'Encuentra y únete a retas deportivas cerca de ti.',
+  description: 'Encuentra y únete a matchups deportivos cerca de ti.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }): ReactNode {

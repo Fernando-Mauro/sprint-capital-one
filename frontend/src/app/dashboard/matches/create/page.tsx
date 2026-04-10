@@ -84,7 +84,7 @@ export default function CreateMatchPage() {
 
       <header>
         <h1 className="font-headline font-black text-5xl uppercase leading-none tracking-tighter mb-2">
-          NUEVA <span className="text-primary-container">RETA</span>
+          NUEVO <span className="text-primary-container">MATCHUP</span>
         </h1>
         <p className="text-on-surface-variant font-bold uppercase text-sm tracking-widest">
           Configura el encuentro
@@ -253,7 +253,7 @@ export default function CreateMatchPage() {
               )}
               <div>
                 <p className="font-black uppercase text-sm leading-none mb-1">
-                  {isPublic ? 'Reta Pública' : 'Reta Privada'}
+                  {isPublic ? 'Matchup Público' : 'Matchup Privado'}
                 </p>
                 <p className="text-xs text-on-surface-variant uppercase font-bold">
                   {isPublic ? 'Cualquiera puede unirse' : 'Solo con invitación'}
@@ -285,7 +285,7 @@ export default function CreateMatchPage() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-primary to-primary-container py-6 text-on-primary-fixed font-headline font-black text-2xl uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_40px_rgba(0,253,134,0.2)] disabled:opacity-50"
           >
-            {loading ? 'CREANDO...' : 'CREAR RETA'}
+            {loading ? 'CREANDO...' : 'CREAR MATCHUP'}
           </button>
         </div>
       </form>

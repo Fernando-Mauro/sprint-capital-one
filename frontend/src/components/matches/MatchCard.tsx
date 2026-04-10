@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { getSportImage } from '@/lib/sport-images';
 import { Calendar, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
@@ -15,9 +16,14 @@ export default function MatchCard({ reta }: MatchCardProps) {
   return (
     <Link
       href={`/dashboard/matches/${reta.id}`}
-      className="bg-surface-container-low p-6 flex flex-col justify-between border-l-8 border-primary-container hover:border-primary transition-colors group"
+      className="bg-surface-container-low flex flex-col justify-between border-l-8 border-primary-container hover:border-primary transition-colors group relative overflow-hidden"
     >
-      <div>
+      {/* Sport background image */}
+      <div className="absolute right-0 top-0 w-1/3 h-full opacity-10 grayscale">
+        <img src={getSportImage(reta.sports?.name)} alt="" className="w-full h-full object-cover" />
+      </div>
+
+      <div className="relative z-10 p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="bg-primary-container text-on-primary-fixed px-3 py-1 text-[10px] font-black uppercase italic">
             {reta.sports?.name ?? 'Deporte'}
@@ -43,7 +49,7 @@ export default function MatchCard({ reta }: MatchCardProps) {
           </div>
         </div>
       </div>
-      <div>
+      <div className="relative z-10 px-6 pb-6">
         <div className="flex justify-between items-end mb-2">
           <span
             className={cn(

@@ -62,8 +62,8 @@ export default function DashboardPage() {
         </div>
         <div className="relative z-10">
           <h1 className="font-headline font-black text-5xl md:text-7xl uppercase leading-[0.9] tracking-tighter mb-2 italic">
-            PRÓXIMAS <br />
-            <span className="text-primary-container">RETAS</span>
+            PRÓXIMOS <br />
+            <span className="text-primary-container">MATCHUPS</span>
           </h1>
           <p className="font-sans font-bold text-primary max-w-xs uppercase tracking-widest text-xs">
             Busca. Únete. Domina la cancha.
@@ -87,9 +87,9 @@ export default function DashboardPage() {
         <LoadingSkeleton />
       ) : retas.length === 0 ? (
         <EmptyState
-          title={activeSport ? 'No hay retas de este deporte' : 'No hay retas disponibles'}
-          description="Sé el primero en crear una"
-          actionLabel="Crear Reta"
+          title={activeSport ? 'No hay matchups de este deporte' : 'No hay matchups disponibles'}
+          description="Sé el primero en crear uno"
+          actionLabel="Crear Matchup"
           actionHref="/dashboard/matches/create"
         />
       ) : (
