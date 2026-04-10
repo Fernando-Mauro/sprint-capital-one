@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { createMatch, getSports } from '@/services/matches';
+import InteractiveTimePicker from '@/components/ui/InteractiveTimePicker';
 import { ArrowLeft, Calendar, Globe, Lock, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -156,13 +157,7 @@ export default function CreateMatchPage() {
             <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">
               Hora de Inicio
             </label>
-            <input
-              className="w-full bg-surface-container-lowest border-b-2 border-outline-variant px-0 py-4 text-lg font-bold text-on-surface appearance-none focus:border-primary-container focus:outline-none"
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              required
-            />
+            <InteractiveTimePicker value={startTime} onChange={setStartTime} required />
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-bold uppercase text-outline mb-2 tracking-widest">

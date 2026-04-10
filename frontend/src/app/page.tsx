@@ -14,15 +14,15 @@ export default function HomePage(): ReactNode {
         }}
       />
 
-      <main className="relative z-10 w-full max-w-lg px-6 py-12 text-center">
-        <h1 className="font-headline text-7xl md:text-9xl font-black uppercase tracking-tighter italic text-primary-container leading-none mb-6">
-          MATCHUP
+      <main className="relative z-10 w-full max-w-lg px-6 py-12 flex flex-col items-center justify-center text-center mx-auto">
+        <h1 className="font-headline text-7xl md:text-9xl font-black uppercase tracking-tighter text-primary-container leading-none mb-6 text-center w-full flex justify-center">
+          <span className="italic pr-4 md:pr-8">MATCHUP</span>
         </h1>
-        <p className="font-headline text-xl md:text-3xl font-black uppercase tracking-tighter text-on-surface leading-tight mb-12">
+        <p className="font-headline text-xl md:text-3xl font-black uppercase tracking-tighter text-on-surface leading-tight mb-12 w-full text-center">
           Encuentra tu próximo juego
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-4 w-full">
           <Link
             href="/login"
             className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-black uppercase text-xl py-4 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
@@ -37,7 +37,7 @@ export default function HomePage(): ReactNode {
           </Link>
         </div>
 
-        <footer className="mt-16">
+        <footer className="mt-16 w-full text-center">
           <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
             Created by Muchachos, idk © 2026 MatchUp
           </p>

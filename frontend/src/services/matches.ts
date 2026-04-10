@@ -218,6 +218,10 @@ export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
   return updateMatch(id, { status: 'cancelled' });
 }
 
+export async function completeMatch(id: string): Promise<ServiceResult<Reta>> {
+  return updateMatch(id, { status: 'completed' });
+}
+
 export async function getMyMatchups(userId: string): Promise<ServiceResult<Reta[]>> {
   const supabase = getSupabase();
 
