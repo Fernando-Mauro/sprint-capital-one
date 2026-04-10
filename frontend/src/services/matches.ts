@@ -193,6 +193,31 @@ export async function cancelMatch(id: string): Promise<ServiceResult<Reta>> {
   return updateMatch(id, { status: 'cancelled' });
 }
 
+export async function getMyMatchups(userId: string): Promise<ServiceResult<Reta[]>> {
+  const supabase = getSupabase();
+
+  // Get all reta IDs the user has joined
+  const { data: playerRows, error: playerError } = await supabase
+    .from('reta_players')
+    .select('reta_id')
+    .eq('user_id', userId)
+    .eq('status', 'confirmed');
+
+  if (playerError) return { data: null, error: playerError.message };
+  if (!playerRows || playerRows.length === 0) return { data: [], error: null };
+
+  const retaIds = playerRows.map((r) => r.reta_id);
+
+  const { data, error } = await supabase
+    .from('retas')
+    .select('*, sports(*)')
+    .in('id', retaIds)
+    .order('date', { ascending: true });
+
+  if (error) return { data: null, error: error.message };
+  return { data: data as unknown as Reta[], error: null };
+}
+
 export async function getSports(): Promise<ServiceResult<{ id: string; name: string }[]>> {
   const supabase = getSupabase();
   const { data, error } = await supabase.from('sports').select('id, name').order('name');
