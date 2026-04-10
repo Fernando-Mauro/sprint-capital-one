@@ -1,12 +1,11 @@
 import { createServerClient as createClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-import type { Database } from '@/lib/supabase/types';
-
-export async function createServerClient(): Promise<ReturnType<typeof createClient<Database>>> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createServerClient(): Promise<ReturnType<typeof createClient<any>>> {
   const cookieStore = await cookies();
 
-  return createClient<Database>(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -21,7 +20,6 @@ export async function createServerClient(): Promise<ReturnType<typeof createClie
             options?: Record<string, unknown>;
           }[],
         ): void {
-          // TODO: Handle cookie setting for server-side auth
           cookiesToSet.forEach(({ name, value, options }) => {
             cookieStore.set(name, value, options);
           });
