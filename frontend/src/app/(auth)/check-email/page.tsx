@@ -4,9 +4,9 @@ import AuthBackground from '@/components/auth/AuthBackground';
 import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
-export default function CheckEmailPage() {
+function CheckEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') ?? '';
   const [resending, setResending] = useState(false);
@@ -110,5 +110,21 @@ export default function CheckEmailPage() {
         </footer>
       </main>
     </AuthBackground>
+  );
+}
+
+export default function CheckEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthBackground>
+          <main className="relative z-10 w-full max-w-lg px-6 py-12">
+            <div className="bg-surface-container-low border-l-8 border-primary-container p-10 animate-pulse h-96" />
+          </main>
+        </AuthBackground>
+      }
+    >
+      <CheckEmailContent />
+    </Suspense>
   );
 }
