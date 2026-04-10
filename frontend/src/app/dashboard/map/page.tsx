@@ -88,7 +88,7 @@ function getSportIconSvg(name: string | undefined): string {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     IconFlag) as any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return renderToStaticMarkup(<Icon size={22} stroke={2.5} /> as any);
+  return renderToStaticMarkup((<Icon size={22} stroke={2.5} />) as any);
 }
 
 export default function MapPage() {
